@@ -246,11 +246,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void OutputResult();
 
-	//! A function calculates the percentages of population elements.
-	/*!
-	*/
-	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
-	void CalculateData(int gen, int stage, TArray<UQuest*> &questArray);
 
 
 

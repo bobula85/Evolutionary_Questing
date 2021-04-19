@@ -10,47 +10,40 @@
 #include "Initial_IntegrationCharacter.h"
 #include "PlayStyleManager.h"
 
-struct FSortByFitness
-{
-	FSortByFitness(const UQuest& quest)
-	{}
 
-	bool operator()(const UQuest* A, const UQuest* B) const
-	{
-		int fitnessA = A->m_iTotalFitness;
-		int fitnessB = B->m_iTotalFitness;
 
-		return fitnessA > fitnessB;
-	}
-};
+//Compile options for debug and logging
+
+#define ONSCREEN_DEBUG_ENABLED = 0
+#define LOGGING_ENABLED = 1
+
+
 
 // Sets default values
 void UEvolutionManager::Init(AInitial_IntegrationCharacter* p, UQuestManager* mgr)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//PrimaryActorTick.bCanEverTick = true;
-
 	// Initialise object pointers
-	m_pPlayer = p;
-	m_pQuestMgr = mgr;
+	m_pPlayer				= p;
+	m_pQuestMgr				= mgr;
 
 	// Initialise maximum amount of mating parents value
-	m_iMaxPairs = 50;
+	m_iMaxPairs				= 50;
 
 	// Initialise maximum population size value
-	m_iMaxPopulation = 25;
+	m_iMaxPopulation		= 25;
 
 	// Initialise the number of evolutions 
 	// that have taken place
-	m_iEvolutionNumber = 1;
+	m_iEvolutionNumber		= 1;
 
-	m_iReintroRate = 10;
+	// The rate at which lost genetic material is reintroduced when lost
+	m_iReintroRate			= 10;
 
-	m_PreviousFreqInfoSel = {};
-	m_CurrentFreqInfoSel	 = {};
+	m_PreviousFreqInfoSel	= {};
+	m_CurrentFreqInfoSel	= {};
 
-	m_PreviousFreqInfoFin = {};
-	m_CurrentFreqInfoFin = {};
+	m_PreviousFreqInfoFin	= {};
+	m_CurrentFreqInfoFin	= {};
 }
 
 // Initiate the various stage of the evolutionary process
@@ -92,9 +85,13 @@ void UEvolutionManager::EvolveQuests()
 	DisplayChangeSel();
 	DisplayChangeFin();
 
+#ifdef LOGGING_ENABLED
+
 	// Savle the created solutions information to
 	// a .csv file
-	//OutputResult();
+	OutputResult();
+
+#endif
 
 	// Increment the number of evolutions that has taken place
 	m_iEvolutionNumber++;
@@ -283,9 +280,6 @@ void UEvolutionManager::SelectRoulette()
 		sumOfFitness += (m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
 	}
 
-	// Seed the random number generator
-	//srand(time(NULL));
-
 	// Loop through the population and select maxPairs of parent solutions 
 	for (int i = 0; i < m_iMaxPairs; i++)
 	{
@@ -427,8 +421,8 @@ void UEvolutionManager::Combine()
 		m_aParents[i].c2 = child2;
 
 		// Initialise children quests using elements of the parents
-		child1->Init(m_aParents[i].p1->m_eDistBand, m_aParents[i].p1->m_eType, L"Quest? 1", m_pQuestMgr);
-		child2->Init(m_aParents[i].p2->m_eDistBand, m_aParents[i].p2->m_eType, L"Quest? 2", m_pQuestMgr);
+		child1->Init(m_aParents[i].p1->m_eDistBand, m_aParents[i].p2->m_eType, L"Quest? 1", m_pQuestMgr);
+		child2->Init(m_aParents[i].p2->m_eDistBand, m_aParents[i].p1->m_eType, L"Quest? 2", m_pQuestMgr);
 
 
 		// Update child solutions distance, name and description information
@@ -725,7 +719,7 @@ void UEvolutionManager::Survive()
 
 void UEvolutionManager::CalculateFrequencyFin(Ffrequency_Count* count)
 {
-
+	// Loop which caounts the the amount of each quest type element in the current population
 	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
 	{
 		switch (m_pQuestMgr->vpPopulation[i]->m_eType)
@@ -758,20 +752,24 @@ void UEvolutionManager::CalculateFrequencyFin(Ffrequency_Count* count)
 		}
 	}
 
+	// Calculate the amount each type element appears in the population as a percentage
 	count->KillFreq = ((float)count->KillCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 	count->GatherFreq = ((float)count->GatherCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 	count->FetchFreq = ((float)count->FetchCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 	count->ExploreFreq = ((float)count->ExploreCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 
+	// Add the type frequencies to an array for later use
 	count->TypeFreqs.Add(count->KillFreq);
 	count->TypeFreqs.Add(count->GatherFreq);
 	count->TypeFreqs.Add(count->FetchFreq);
 	count->TypeFreqs.Add(count->ExploreFreq);
 
+	// Calculate the amount each type element appears in the population as a percentage
 	count->CloseFreq = ((float)count->CloseCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 	count->MidFreq = ((float)count->MidCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 	count->FarFreq = ((float)count->FarCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 
+	// Add the type frequencies to an array for later use
 	count->DistFreqs.Add(count->CloseFreq);
 	count->DistFreqs.Add(count->MidFreq);
 	count->DistFreqs.Add(count->FarFreq);
@@ -779,8 +777,6 @@ void UEvolutionManager::CalculateFrequencyFin(Ffrequency_Count* count)
 
 void UEvolutionManager::DisplayChangeSel()
 {
-	//% increase = (Increase ÷ Original Number) × 100.
-
 	if (m_PreviousFreqInfoSel.TypeFreqs.Num() == 0)
 		return;
 
@@ -788,45 +784,54 @@ void UEvolutionManager::DisplayChangeSel()
 
 	for (int i = 0; i < m_CurrentFreqInfoSel.TypeFreqs.Num(); i++)
 	{
+		// Compare current and previous frequency data to get the increase amount
 		float increase = m_CurrentFreqInfoSel.TypeFreqs[i] - m_PreviousFreqInfoSel.TypeFreqs[i];
 
+		// Calculate the increase as a percentage
 		float percentInc = (increase / m_CurrentFreqInfoSel.TypeFreqs[i]) * 100;
 
-		//FString temp = FString::SanitizeFloat(percentInc);
-
+		// Add the percentage increase to an array for later use
 		percentIncrease.Add(percentInc);
 	}
 
+	// Set the current type frequency values
 	m_CurrentFreqInfoSel.KillChange		= percentIncrease[0];
 	m_CurrentFreqInfoSel.GatherChange	= percentIncrease[1];
 	m_CurrentFreqInfoSel.FetchChange	= percentIncrease[2];
 	m_CurrentFreqInfoSel.ExploreChange	= percentIncrease[3];
 
+
 	for (int i = 0; i < m_CurrentFreqInfoSel.DistFreqs.Num(); i++)
 	{
+		// Compare current and previous frequency data to get the increase amount
 		float increase = m_CurrentFreqInfoSel.DistFreqs[i] - m_PreviousFreqInfoSel.DistFreqs[i];
 
+		// Calculate the increase as a percentage
 		float percentInc = (increase / m_CurrentFreqInfoSel.DistFreqs[i]) * 100;
 
+		// Add the percentage increase to an array for later use
 		percentIncrease.Add(percentInc);
 	}
 
-	m_CurrentFreqInfoSel.CloseChange = percentIncrease[4];
-	m_CurrentFreqInfoSel.MidChange = percentIncrease[5];
-	m_CurrentFreqInfoSel.FarChange = percentIncrease[6];
+	// Set the current distance frequency values
+	m_CurrentFreqInfoSel.CloseChange	= percentIncrease[4];
+	m_CurrentFreqInfoSel.MidChange		= percentIncrease[5];
+	m_CurrentFreqInfoSel.FarChange		= percentIncrease[6];
 
+#ifdef DEBUG_ENABLED
 
-	/*if (GEngine)
+	// Onscreen debug output
+	if (GEngine)
 	{
 		FString Gen = FString(TEXT("GENERATION NUMBER: "));
-		Gen += FString::FromInt(evolutionNumber);
+		Gen += FString::FromInt(m_iEvolutionNumber);
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Green, Gen, false);
 
 		for (int i = 0; i < percentIncrease.Num(); i++)
 		{
 			if (percentIncrease[i] > 0)
 			{
-				FString temp = questMgr->getTypeName(i);
+				FString temp = m_pQuestMgr->getTypeName(i);
 				temp += FString(TEXT(": "));
 				temp += FString::SanitizeFloat(percentIncrease[i]);
 				temp += FString(TEXT("% Increased"));
@@ -835,7 +840,7 @@ void UEvolutionManager::DisplayChangeSel()
 			}
 			if (percentIncrease[i] < 0)
 			{
-				FString temp = questMgr->getTypeName(i);
+				FString temp = m_pQuestMgr->getTypeName(i);
 				temp += FString(TEXT(": "));
 				temp += FString::SanitizeFloat(percentIncrease[i]);
 				temp += FString(TEXT("% Decrease"));
@@ -844,22 +849,20 @@ void UEvolutionManager::DisplayChangeSel()
 			}
 			if (percentIncrease[i] == 0)
 			{
-				FString temp = questMgr->getTypeName(i);
+				FString temp = m_pQuestMgr->getTypeName(i);
 				temp += FString(TEXT(": "));
 				temp += FString(TEXT("No Change"));
 
 				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Yellow, temp, false);
 			}
 		}
-	}*/
+	}
+#endif
 
 }
 
 void UEvolutionManager::DisplayChangeFin()
 {
-	//% increase = (Increase ÷ Original Number) × 100.
-
-		//Ffrequency_Count tempCount;
 	m_CurrentFreqInfoFin = {};
 
 	// Get frequency information 
@@ -872,135 +875,89 @@ void UEvolutionManager::DisplayChangeFin()
 
 	for (int i = 0; i < m_CurrentFreqInfoFin.TypeFreqs.Num(); i++)
 	{
+		// Compare surrent and previous frequency data to get the increase amount
 		float increase = m_CurrentFreqInfoFin.TypeFreqs[i] - m_PreviousFreqInfoFin.TypeFreqs[i];
 
+		// Calculate the increase as a percentage
 		float percentInc = (increase / m_CurrentFreqInfoFin.TypeFreqs[i]) * 100;
 
-		//FString temp = FString::SanitizeFloat(percentInc);
-
+		// Add the percentage increase to an array for later use
 		percentIncreaseFin.Add(percentInc);
 	}
 
-	m_CurrentFreqInfoFin.KillChange = percentIncreaseFin[0];
-	m_CurrentFreqInfoFin.GatherChange = percentIncreaseFin[1];
-	m_CurrentFreqInfoFin.FetchChange = percentIncreaseFin[2];
-	m_CurrentFreqInfoFin.ExploreChange = percentIncreaseFin[3];
+	// Set the current type frequency values for 
+	m_CurrentFreqInfoFin.KillChange			= percentIncreaseFin[0];
+	m_CurrentFreqInfoFin.GatherChange		= percentIncreaseFin[1];
+	m_CurrentFreqInfoFin.FetchChange		= percentIncreaseFin[2];
+	m_CurrentFreqInfoFin.ExploreChange		= percentIncreaseFin[3];
 
 	for (int i = 0; i < m_CurrentFreqInfoFin.DistFreqs.Num(); i++)
 	{
+		// Compare current and previous frequency data to get the increase amount
 		float increase = m_CurrentFreqInfoFin.DistFreqs[i] - m_PreviousFreqInfoFin.DistFreqs[i];
 
+		// Calculate the increase as a percentage
 		float percentInc = (increase / m_CurrentFreqInfoFin.DistFreqs[i]) * 100;
 
+		// Add the percentage increase to an array for later use
 		percentIncreaseFin.Add(percentInc);
 	}
 
-	m_CurrentFreqInfoFin.CloseChange = percentIncreaseFin[4];
-	m_CurrentFreqInfoFin.MidChange = percentIncreaseFin[5];
-	m_CurrentFreqInfoFin.FarChange = percentIncreaseFin[6];
+	// Set the current distance frequency values
+	m_CurrentFreqInfoFin.CloseChange		= percentIncreaseFin[4];
+	m_CurrentFreqInfoFin.MidChange			= percentIncreaseFin[5];
+	m_CurrentFreqInfoFin.FarChange			= percentIncreaseFin[6];
 
+#ifdef DEBUG_ENABLED
 
-	/*if (GEngine)
+	// Onscreen debug output
+	if (GEngine)
 	{
 		FString Gen = FString(TEXT("GENERATION NUMBER: "));
-		Gen += FString::FromInt(evolutionNumber);
+		Gen += FString::FromInt(m_iEvolutionNumber);
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Green, Gen, false);
 
-		for (int i = 0; i < percentIncrease.Num(); i++)
+		for (int i = 0; i < percentIncreaseFin.Num(); i++)
 		{
-			if (percentIncrease[i] > 0)
+			if (percentIncreaseFin[i] > 0)
 			{
-				FString temp = questMgr->getTypeName(i);
+				FString temp = m_pQuestMgr->getTypeName(i);
 				temp += FString(TEXT(": "));
-				temp += FString::SanitizeFloat(percentIncrease[i]);
+				temp += FString::SanitizeFloat(percentIncreaseFin[i]);
 				temp += FString(TEXT("% Increased"));
 
 				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Green, temp, false);
 			}
-			if (percentIncrease[i] < 0)
+			if (percentIncreaseFin[i] < 0)
 			{
-				FString temp = questMgr->getTypeName(i);
+				FString temp = m_pQuestMgr->getTypeName(i);
 				temp += FString(TEXT(": "));
-				temp += FString::SanitizeFloat(percentIncrease[i]);
+				temp += FString::SanitizeFloat(percentIncreaseFin[i]);
 				temp += FString(TEXT("% Decrease"));
 
 				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Red, temp, false);
 			}
-			if (percentIncrease[i] == 0)
+			if (percentIncreaseFin[i] == 0)
 			{
-				FString temp = questMgr->getTypeName(i);
+				FString temp = m_pQuestMgr->getTypeName(i);
 				temp += FString(TEXT(": "));
 				temp += FString(TEXT("No Change"));
 
 				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Yellow, temp, false);
 			}
 		}
-	}*/
-
-}
-
-void UEvolutionManager::CalculateData(int gen, int stage, TArray<UQuest*> &questArray)
-{
-	int killTot		= 0;
-	int gatherTot	= 0;
-	int fetchTot	= 0;
-	int exploreTot	= 0;
-	int closeTot	= 0;
-	int midTot		= 0;
-	int farTot		= 0;
-
-	for (int i = 0; i < questArray.Num(); i++)
-	{
-		switch (questArray[i]->m_eType)
-		{
-		case TP_KILL:
-			killTot++;
-			break;
-		case TP_GATHER:
-			gatherTot++;
-			break;
-		case TP_FETCH:
-			fetchTot++;
-			break;
-		case TP_EXPLORE:
-			exploreTot++;
-			break;
-		}
-
-		switch (questArray[i]->m_eDistBand)
-		{
-		case DIST_CLOSE:
-			closeTot++;
-			break;
-		case DIST_MID:
-			midTot++;
-			break;
-		case DIST_FAR:
-			farTot++;
-			break;
-		}
 	}
 
-	FGenerationData tempData;
-
-	tempData.Generation			= gen;
-	tempData.Stage				= stage;
-
-	tempData.PercentageKill		=	killTot	/ questArray.Num();
-	tempData.PercentageGather	=	gatherTot / questArray.Num();
-	tempData.PercentageFetch	=	fetchTot / questArray.Num();
-	tempData.PercentageExplore	=	exploreTot / questArray.Num();
-	tempData.PercentageClose	=	closeTot / questArray.Num();
-	tempData.PercentageMid		=	midTot / questArray.Num();
-	tempData.PercentageFar		=	farTot / questArray.Num();
+#endif
 }
 
 void UEvolutionManager::OutputResult()
 {
-	/*FString FilePath = FPaths::ConvertRelativePathToFull(FPaths::GameSavedDir()) + TEXT("/MessageLog.csv");
+	FString FilePath = FPaths::ConvertRelativePathToFull(FPaths::GameSourceDir()) + TEXT("/DataOutput/MessageLog.csv");
 	FString FileContent = TEXT("\n");
+
 	FileContent += TEXT("GENERATION NUMBER,  ");
-	FileContent += FString::FromInt(evolutionNumber);
+	FileContent += FString::FromInt(m_iEvolutionNumber);
 	FileContent += TEXT(",\n");
 	FileContent += TEXT("\n");
 
@@ -1008,190 +965,106 @@ void UEvolutionManager::OutputResult()
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("KILL,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.KillFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.KillFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iKill_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iKill_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FETCH,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.FetchFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.FetchFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iFetch_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iFetch_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("GATHER,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.GatherFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.GatherFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iGather_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iGather_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("EXPLORE,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.ExploreFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.ExploreFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iExplore_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iExplore_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("CLOSE,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.CloseFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.CloseFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iClose_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iClose_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("MID,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.MidFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.MidFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iMid_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iMid_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FAR,");
-	FileContent += FString::FromInt(CurrentFreqInfoSel.FarFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoSel.FarFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iFar_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iFar_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FINAL STAGE \n");
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("KILL,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.KillFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.KillFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iKill_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iKill_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FETCH,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.FetchFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.FetchFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iFetch_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iFetch_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("GATHER,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.GatherFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.GatherFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iGather_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iGather_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("EXPLORE,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.ExploreFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.ExploreFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iExplore_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iExplore_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("CLOSE,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.CloseFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.CloseFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iClose_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iClose_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("MID,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.MidFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.MidFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iMid_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iMid_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FAR,");
-	FileContent += FString::FromInt(CurrentFreqInfoFin.FarFreq);
+	FileContent += FString::FromInt(m_CurrentFreqInfoFin.FarFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->m_iFar_Fitness);
+	FileContent += FString::FromInt(m_pPlayer->style->m_iFar_Fitness);
 	FileContent += TEXT("\n");
 
 	FFileHelper::SaveStringToFile(FileContent, *FilePath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);
-
-		/*FPair_SaveGeneration newGeneration;
-		newGeneration.GenerationNumber = evolutionNumber;
-		
-		for (int i = 0; i < parents.Num(); i++)
-		{
-			FPair_SaveItem parent1;
-			parent1.x 			= parents[i].p1->x;
-			parent1.y 			= parents[i].p1->y;
-			parent1.DistBanding = parents[i].p1->distBand;
-			parent1.Type 		= parents[i].p1->type;
-			
-			FPair_SaveItem parent2;
-			parent2.x 			= parents[i].p2->x;
-			parent2.y 			= parents[i].p2->y;
-			parent2.DistBanding = parents[i].p2->distBand;
-			parent2.Type 		= parents[i].p2->type;
-			
-			FPair_SaveItem child1;
-			child1.x 			= parents[i].c1->x;
-			child1.y 			= parents[i].c1->y;
-			child1.DistBanding 	= parents[i].c1->distBand;
-			child1.Type 		= parents[i].c1->type;
-			
-			FPair_SaveItem child2;
-			child2.x 			= parents[i].c2->x;
-			child2.y 			= parents[i].c2->y;
-			child2.DistBanding 	= parents[i].c2->distBand;
-			child2.Type 		= parents[i].c2->type;
-			
-			FPair_SaveItems tempItem;
-			tempItem.p1 = parent1;
-			tempItem.p2 = parent2;
-			tempItem.c1 = child1;
-			tempItem.c2 = child2;
-			
-			newGeneration.GenerationPairs.Add(tempItem);
-		}
-		
-		EvoGenerations.Add(newGeneration);
-		
-		//set vals
-		
-		
-		
-		
-	 Create output file name
-	wchar_t test[80] = { '\0' };
-	swprintf(test, sizeof(test), L"C:\\Users\\bobby\\Desktop\\Uni\\Test\\Prototype 1\\Output\\Evolution%i.csv", evolutionNumber);
-
-	// Open a handle to the file
-	HANDLE hFile = CreateFile(
-		test,					// Filename
-		GENERIC_WRITE,          // Desired access
-		FILE_SHARE_READ,        // Share mode
-		NULL,                   // Security attributes
-		CREATE_NEW,             // Creates a new file, only if it doesn't already exist
-		FILE_ATTRIBUTE_NORMAL,  // Flags and attributes
-		NULL);                  // Template file handle
-
-	// return is file doesnt open
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		// Failed to open/create file
-		return;
-	}
-
-	DWORD bytesWritten;
-
-	// Loop through all children created and save thier quest type and location to the .csv file
-	for (unsigned int i = 0; i < children.size(); i++)
-	{
-		wchar_t questText[80] = { '\0' };
-		swprintf(questText, sizeof(questText), L"%i, , %i,\n", children[i]->type, children[i]->distBand);
-
-		WriteFile(hFile,				// Handle to the file
-			questText,					// Buffer to write
-			sizeof(questText),			// Buffer size
-			&bytesWritten,				// Bytes written
-			nullptr);					// Overlapped
-	}
-
-	// Close the handle once we don't need it.
-	CloseHandle(hFile);*/
 }
 
