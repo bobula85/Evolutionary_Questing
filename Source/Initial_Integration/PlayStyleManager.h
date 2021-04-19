@@ -13,150 +13,146 @@ class INITIAL_INTEGRATION_API UPlayStyleManager : public UActorComponent
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	//! A function which initialises the play style manager.
+	/*!
+
+	*/
 	UFUNCTION(BlueprintCallable, Category = "PlayStyle")
 	void Init();
 
-protected:
-	// Called when the game starts or when spawned
-	//UFUNCTION(BlueprintCallable, Category = "PlayStyle")
-	//virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
-
 	//! A function which updates the players play style.
-/*!
-	\param
-*/
+	/*!
+
+	*/
 	UFUNCTION(BlueprintCallable, Category = "PlayStyle")
 	void CalculateFitness();
 
 	////////////////////////////	KILL STATS	////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Kill_Com;		/*!< An integer value representing amount of kill quests completed */
+	int m_iKill_Com;		/*!< An integer value representing amount of kill quests completed */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Kill_InCom;		/*!< An integer value representing amount of kill quests incomplete */
+	int m_iKill_InCom;		/*!< An integer value representing amount of kill quests incomplete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Kill_Abn;		/*!< An integer value representing amount of kill quests abandoned */
+	int m_iKill_Abn;		/*!< An integer value representing amount of kill quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Kill_Rej;		/*!< An integer value representing amount of kill quests rejected */
+	int m_iKill_Rej;		/*!< An integer value representing amount of kill quests rejected */
 
 	////////////////////////////	GATHER STATS	////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Gather_Com;		/*!< An integer value representing amount of gather quests completed */
+	int m_iGather_Com;		/*!< An integer value representing amount of gather quests completed */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Gather_InCom;	/*!< An integer value representing amount of gather quests incomplete */
+	int m_iGather_InCom;	/*!< An integer value representing amount of gather quests incomplete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Gather_Abn;		/*!< An integer value representing amount of gather quests abandoned */
+	int m_iGather_Abn;		/*!< An integer value representing amount of gather quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Gather_Rej;		/*!< An integer value representing amount of gather quests rejected */
+	int m_iGather_Rej;		/*!< An integer value representing amount of gather quests rejected */
 
 	////////////////////////////	FETCH STATS	////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Fetch_Com;		/*!< An integer value representing amount of fetch quests completed */
+	int m_iFetch_Com;		/*!< An integer value representing amount of fetch quests completed */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Fetch_Abn;		/*!< An integer value representing amount of fetch quests abandoned */
+	int m_iFetch_Abn;		/*!< An integer value representing amount of fetch quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Fetch_InCom;	/*!< An integer value representing amount of fetch quests incomplete */
+	int m_iFetch_InCom;		/*!< An integer value representing amount of fetch quests incomplete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Fetch_Rej;		/*!< An integer value representing amount of fetch quests rejected */
+	int m_iFetch_Rej;		/*!< An integer value representing amount of fetch quests rejected */
 
 	////////////////////////////	EXPLORE STATS	////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Explore_Com;		/*!< An integer value representing amount of fetch quests completed */
+	int m_iExplore_Com;		/*!< An integer value representing amount of fetch quests completed */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Explore_InCom;	/*!< An integer value representing amount of fetch quests incomplete */
+	int m_iExplore_InCom;	/*!< An integer value representing amount of fetch quests incomplete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Explore_Abn;		/*!< An integer value representing amount of fetch quests abandoned */
+	int m_iExplore_Abn;		/*!< An integer value representing amount of fetch quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Explore_Rej;		/*!< An integer value representing amount of explore quests rejected */
+	int m_iExplore_Rej;		/*!< An integer value representing amount of explore quests rejected */
 
 	////////////////////////////	CLOSE STATS		////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Close_Com;		/*!< An integer value representing amount of close quests complete */
+	int m_iClose_Com;		/*!< An integer value representing amount of close quests complete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Close_InCom;	/*!< An integer value representing amount of close quests incomplete */
+	int m_iClose_InCom;		/*!< An integer value representing amount of close quests incomplete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Close_Abn;		/*!< An integer value representing amount of close quests abandoned */
+	int m_iClose_Abn;		/*!< An integer value representing amount of close quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Close_Rej;		/*!< An integer value representing amount of close quests rejected */
+	int m_iClose_Rej;		/*!< An integer value representing amount of close quests rejected */
 
 	////////////////////////////	MID STATS		////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Mid_Com;		/*!< An integer value representing amount of mid quests complete */
+	int m_iMid_Com;			/*!< An integer value representing amount of mid quests complete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Mid_InCom;		/*!< An integer value representing amount of mid quests incomplete */
+	int m_iMid_InCom;		/*!< An integer value representing amount of mid quests incomplete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Mid_Abn;		/*!< An integer value representing amount of mid quests abandoned */
+	int m_iMid_Abn;			/*!< An integer value representing amount of mid quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Mid_Rej;		/*!< An integer value representing amount of mid quests rejected */
+	int m_iMid_Rej;			/*!< An integer value representing amount of mid quests rejected */
 
 	////////////////////////////	FAR STATS		////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Far_Com;		/*!< An integer value representing amount of far quests complete */
+	int m_iFar_Com;			/*!< An integer value representing amount of far quests complete */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Far_InCom;		/*!< An integer value representing amount of far quests incomplete */
+	int m_iFar_InCom;		/*!< An integer value representing amount of far quests incomplete */
 	   	  
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Far_Abn;		/*!< An integer value representing amount of far quests abandoned */
+	int m_iFar_Abn;			/*!< An integer value representing amount of far quests abandoned */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Far_Rej;		/*!< An integer value representing amount of far quests rejected */
+	int m_iFar_Rej;			/*!< An integer value representing amount of far quests rejected */
 
 	////////////////////////////	FITNESS VALUES		////////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Kill_Fitness;		/*!< An integer value representing the final kill fitness */
+	int m_iKill_Fitness;		/*!< An integer value representing the final kill fitness */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Gather_Fitness;		/*!< An integer value representing the final gather fitness */
+	int m_iGather_Fitness;		/*!< An integer value representing the final gather fitness */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Fetch_Fitness;		/*!< An integer value representing the final fetch fitness */
+	int m_iFetch_Fitness;		/*!< An integer value representing the final fetch fitness */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Explore_Fitness;		/*!< An integer value representing the final fetch fitness */
+	int m_iExplore_Fitness;		/*!< An integer value representing the final fetch fitness */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Close_Fitness;		/*!< An integer value representing the final close fitness */
+	int m_iClose_Fitness;		/*!< An integer value representing the final close fitness */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Mid_Fitness;		/*!< An integer value representing the final mid fitness */
+	int m_iMid_Fitness;			/*!< An integer value representing the final mid fitness */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PlayStyle")
-	int Far_Fitness;		/*!< An integer value representing the final far fitness */
+	int m_iFar_Fitness;			/*!< An integer value representing the final far fitness */
 
-	double compMultiplier; 
-	double inCompMultiplier;
-	double abnMultiplier;
-	double rejMultiplier;
+	// could be exposed to the unreal editor for easy modification
+
+	double m_dCompMultiplier;		/*!< A multiplier of type double used in the completed quests part of the fitness calculation */
+	double m_dInCompMultiplier;		/*!< A multiplier of type double used in the incomplete quests part of the fitness calculation */
+	double m_dAbnMultiplier;		/*!< A multiplier of type double used in the abandoned quests part of the fitness calculation */
+	double m_dRejMultiplier;		/*!< A multiplier of type double used in the rejected quests part of the fitness calculation */
 
 };

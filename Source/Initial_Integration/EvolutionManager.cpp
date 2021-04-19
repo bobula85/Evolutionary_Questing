@@ -13,18 +13,12 @@
 struct FSortByFitness
 {
 	FSortByFitness(const UQuest& quest)
-		//: Quest(quest)
-	{
-
-	}
-
-	/* The Location to use in our Sort comparision. */
-	//UQuest Quest;
+	{}
 
 	bool operator()(const UQuest* A, const UQuest* B) const
 	{
-		int fitnessA = A->totalFitness;
-		int fitnessB = B->totalFitness;
+		int fitnessA = A->m_iTotalFitness;
+		int fitnessB = B->m_iTotalFitness;
 
 		return fitnessA > fitnessB;
 	}
@@ -37,44 +31,44 @@ void UEvolutionManager::Init(AInitial_IntegrationCharacter* p, UQuestManager* mg
 	//PrimaryActorTick.bCanEverTick = true;
 
 	// Initialise object pointers
-	player = p;
-	questMgr = mgr;
+	m_pPlayer = p;
+	m_pQuestMgr = mgr;
 
 	// Initialise maximum amount of mating parents value
-	maxPairs = 50;
+	m_iMaxPairs = 50;
 
 	// Initialise maximum population size value
-	maxPopulation = 25;
+	m_iMaxPopulation = 25;
 
 	// Initialise the number of evolutions 
 	// that have taken place
-	evolutionNumber = 1;
+	m_iEvolutionNumber = 1;
 
-	ReintroRate = 10;
+	m_iReintroRate = 10;
 
-	PreviousFreqInfoSel = {};
-	CurrentFreqInfoSel	 = {};
+	m_PreviousFreqInfoSel = {};
+	m_CurrentFreqInfoSel	 = {};
 
-	PreviousFreqInfoFin = {};
-	CurrentFreqInfoFin = {};
+	m_PreviousFreqInfoFin = {};
+	m_CurrentFreqInfoFin = {};
 }
 
 // Initiate the various stage of the evolutionary process
 void UEvolutionManager::EvolveQuests()
 {
 	// Update previous population stats
-	PreviousFreqInfoSel = {};
-	PreviousFreqInfoFin = {};
+	m_PreviousFreqInfoSel = {};
+	m_PreviousFreqInfoFin = {};
 
-	PreviousFreqInfoSel = CurrentFreqInfoSel;
-	PreviousFreqInfoFin = CurrentFreqInfoFin;
+	m_PreviousFreqInfoSel = m_CurrentFreqInfoSel;
+	m_PreviousFreqInfoFin = m_CurrentFreqInfoFin;
 	
 	// Use the player statistics to calculate the optimum fitness values
-	player->style->CalculateFitness();
+	m_pPlayer->style->CalculateFitness();
 
 	// Evaluate all current population solutions based on player statistics
-	for (int i = 0; i < questMgr->vpPopulation.Num(); i++)
-		Evaluate(questMgr->vpPopulation[i]);
+	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
+		Evaluate(m_pQuestMgr->vpPopulation[i]);
 
 	// Initiate the selection of the parent solutions
 	// using roulette wheel selection
@@ -103,50 +97,46 @@ void UEvolutionManager::EvolveQuests()
 	//OutputResult();
 
 	// Increment the number of evolutions that has taken place
-	evolutionNumber++;
+	m_iEvolutionNumber++;
 }
 
 void UEvolutionManager::Evaluate(UQuest* qst)
 {
 	// based on the qst type value set the fitness type element of the soultion
-	switch (qst->type)
+	switch (qst->m_eType)
 	{
 		// Kill quest type
 	case TP_KILL:
 	{
 		// Set type fitness
-		qst->typeElementFitness =
-			player->style->Kill_Fitness;
+		qst->m_iTypeElementFitness = m_pPlayer->style->m_iKill_Fitness;
 
 		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->distBand)
+		switch (qst->m_eDistBand)
 		{
 			// Close Quests
 		case DIST_CLOSE:
 		{
-			qst->distElementFitness =
-				player->style->Close_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Kill_Fitness + player->style->Close_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iKill_Fitness + m_pPlayer->style->m_iClose_Fitness);
 
 			break;
 		}
 		// Mid Quests
 		case DIST_MID:
 		{
-			qst->distElementFitness =
-				player->style->Mid_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Kill_Fitness + player->style->Mid_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iKill_Fitness + m_pPlayer->style->m_iMid_Fitness);
 			break;
 		}
 		// Far away quests
 		case DIST_FAR:
 		{
-			qst->distElementFitness =
-				player->style->Far_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Kill_Fitness + player->style->Far_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iKill_Fitness + m_pPlayer->style->m_iFar_Fitness);
 			break;
 		}
 		}
@@ -157,37 +147,33 @@ void UEvolutionManager::Evaluate(UQuest* qst)
 	case TP_GATHER:
 	{
 		// Set type fitness
-		qst->typeElementFitness =
-			player->style->Gather_Fitness;
+		qst->m_iTypeElementFitness = m_pPlayer->style->m_iGather_Fitness;
 
 		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->distBand)
+		switch (qst->m_eDistBand)
 		{
 			// Close Quests
 		case DIST_CLOSE:
 		{
-			qst->distElementFitness =
-				player->style->Close_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Gather_Fitness + player->style->Close_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iGather_Fitness + m_pPlayer->style->m_iClose_Fitness);
 			break;
 		}
 		// Mid Quests
 		case DIST_MID:
 		{
-			qst->distElementFitness =
-				player->style->Mid_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Gather_Fitness + player->style->Mid_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iGather_Fitness + m_pPlayer->style->m_iMid_Fitness);
 			break;
 		}
 		// Far away quests
 		case DIST_FAR:
 		{
-			qst->distElementFitness =
-				player->style->Far_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Gather_Fitness + player->style->Far_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iGather_Fitness + m_pPlayer->style->m_iFar_Fitness);
 			break;
 		}
 		}
@@ -198,37 +184,33 @@ void UEvolutionManager::Evaluate(UQuest* qst)
 	case TP_EXPLORE:
 	{
 		// Set type fitness
-		qst->typeElementFitness =
-			player->style->Explore_Fitness;
+		qst->m_iTypeElementFitness = m_pPlayer->style->m_iExplore_Fitness;
 
 		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->distBand)
+		switch (qst->m_eDistBand)
 		{
 			// Close Quests
 		case DIST_CLOSE:
 		{
-			qst->distElementFitness =
-				player->style->Close_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Explore_Fitness + player->style->Close_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iExplore_Fitness + m_pPlayer->style->m_iClose_Fitness);
 			break;
 		}
 		// Mid Quests
 		case DIST_MID:
 		{
-			qst->distElementFitness =
-				player->style->Mid_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Explore_Fitness + player->style->Mid_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iExplore_Fitness + m_pPlayer->style->m_iMid_Fitness);
 			break;
 		}
 		// Far away quests
 		case DIST_FAR:
 		{
-			qst->distElementFitness =
-				player->style->Far_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Explore_Fitness + player->style->Far_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iExplore_Fitness + m_pPlayer->style->m_iFar_Fitness);
 			break;
 		}
 		}
@@ -239,37 +221,33 @@ void UEvolutionManager::Evaluate(UQuest* qst)
 	case TP_FETCH:
 	{
 		// Set type fitness
-		qst->typeElementFitness =
-			player->style->Fetch_Fitness;
+		qst->m_iTypeElementFitness = m_pPlayer->style->m_iFetch_Fitness;
 
 		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->distBand)
+		switch (qst->m_eDistBand)
 		{
 			// Close Quests
 		case DIST_CLOSE:
 		{
-			qst->distElementFitness =
-				player->style->Close_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Fetch_Fitness + player->style->Close_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iFetch_Fitness + m_pPlayer->style->m_iClose_Fitness);
 			break;
 		}
 		// Mid Quests
 		case DIST_MID:
 		{
-			qst->distElementFitness =
-				player->style->Mid_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Fetch_Fitness + player->style->Mid_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iFetch_Fitness + m_pPlayer->style->m_iMid_Fitness);
 			break;
 		}
 		// Far away quests
 		case DIST_FAR:
 		{
-			qst->distElementFitness =
-				player->style->Far_Fitness;
+			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
 
-			qst->totalFitness = qst->totalFitness + (player->style->Fetch_Fitness + player->style->Far_Fitness);
+			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iFetch_Fitness + m_pPlayer->style->m_iFar_Fitness);
 			break;
 		}
 		}
@@ -278,15 +256,15 @@ void UEvolutionManager::Evaluate(UQuest* qst)
 	}
 	}
 
-	if (qst->totalFitness <= 0)
-		qst->totalFitness = 1;
+	if (qst->m_iTotalFitness <= 0)
+		qst->m_iTotalFitness = 1;
 }
 
 // Applies the roulette wheel selection method to select parent solutions
 void UEvolutionManager::SelectRoulette()
 {
 	// Empty the parents vector
-	parents.Empty();
+	m_aParents.Empty();
 
 	// Create a vecor to hold the sum of fitness values of selection
 	TArray<int> tempVec;
@@ -295,21 +273,21 @@ void UEvolutionManager::SelectRoulette()
 	int sumOfFitness = 0;
 
 	// Loop through the population and increment the sum of fitness values accordingly
-	for (int i = 0; i < questMgr->vpPopulation.Num(); i++)
+	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
 	{
 		if (i == 0)
-			tempVec.Add(questMgr->vpPopulation[i]->totalFitness);
+			tempVec.Add(m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
 		else
-			tempVec.Add(tempVec[i - 1] + questMgr->vpPopulation[i]->totalFitness);
+			tempVec.Add(tempVec[i - 1] + m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
 
-		sumOfFitness += (questMgr->vpPopulation[i]->totalFitness);
+		sumOfFitness += (m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
 	}
 
 	// Seed the random number generator
 	//srand(time(NULL));
 
 	// Loop through the population and select maxPairs of parent solutions 
-	for (int i = 0; i < maxPairs; i++)
+	for (int i = 0; i < m_iMaxPairs; i++)
 	{
 		// Generate random number between 1 and total fitness for both parents
 		int r1 = FMath::RandRange(1, sumOfFitness);
@@ -324,7 +302,7 @@ void UEvolutionManager::SelectRoulette()
 		{
 			if (tempVec[j] >= r1)
 			{
-				parentPair.p1 = questMgr->vpPopulation[j];
+				parentPair.p1 = m_pQuestMgr->vpPopulation[j];
 				break;
 			}
 		}
@@ -333,7 +311,7 @@ void UEvolutionManager::SelectRoulette()
 		{
 			if (tempVec[j] >= r2)
 			{
-				parentPair.p2 = questMgr->vpPopulation[j];
+				parentPair.p2 = m_pQuestMgr->vpPopulation[j];
 				break;
 			}
 		}
@@ -342,7 +320,7 @@ void UEvolutionManager::SelectRoulette()
 			i--;
 		else
 			// add the parent pair to the parent vector
-			parents.Add(parentPair);
+			m_aParents.Add(parentPair);
 	}
 }
 
@@ -350,95 +328,112 @@ void UEvolutionManager::SelectRoulette()
 void UEvolutionManager::SelectRanked()
 {
 	// Empty the parents vector
-	parents.Empty();
+	m_aParents.Empty();
 
-	TArray<UQuest*> tempVecQuests;
+	// Array to hold the population sorted by fitness
+	TArray<UQuest*> tempVecSortedPop;
 
-	TArray<double> tempVec;
+	// Add all quests to the sort array
+	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
+		tempVecSortedPop.Add(m_pQuestMgr->vpPopulation[i]);
 
-	for (int i = 0; i < questMgr->vpPopulation.Num(); i++)
-		tempVecQuests.Add(questMgr->vpPopulation[i]);
+	// Sort the array using a basic lambda function
+	tempVecSortedPop.Sort([](const UQuest& a, const UQuest& b) { return a.m_iTotalFitness < b.m_iTotalFitness; });
 
-	tempVecQuests.Sort([](const UQuest& a, const UQuest& b) { return a.totalFitness < b.totalFitness; });
-
-	double sumOfRanks = ((double)tempVecQuests.Num() + 1) * ((double)tempVecQuests.Num() / 2);
+	// calculates the total sum of all the ranked positions in the array (eg an array of 4 is 10 as 1+2+3+4 = 10)
+	double sumOfRanks = ((double)tempVecSortedPop.Num() + 1) * ((double)tempVecSortedPop.Num() / 2);
 
 	TArray<double> probs;
 
-	for (int i = 0; i < tempVecQuests.Num(); i++)
+	for (int i = 0; i < tempVecSortedPop.Num(); i++)
 	{
-		double rank = i + 1;
-		double pr = (rank / sumOfRanks);
-		double prob = (rank / sumOfRanks) * 100;
+		//calculates raks probablility i = rank
+		double prob = ((i+1) / sumOfRanks) * 100;
 		probs.Add(prob);
 	}
 
+	// Array to hold the stacked probaility of selection values
+	TArray<double> stackedProbabilities;
+
+	// variable to hold the sum of all of the probabilities (should be 100%)
 	double sumOfRankedFitness = 0;
 
 	// Loop through the population and increment the sum of fitness values accordingly
+	// so that the probabilities stack ready to be selected from eq |  prob1 |   prob2 = prob1 +prob2     |		prob3 = prob2 + prob3			| etc
 	for (int i = 0; i < probs.Num(); i++)
 	{
 		if (i == 0)
-			tempVec.Add(probs[i]);
+			stackedProbabilities.Add(probs[i]);
 		else
-			tempVec.Add(tempVec[i - 1] + probs[i]);
+			// |  prob1 |   prob2 = prob1 +prob2     |		prob3 = prob2 + prob3			| etc
+			stackedProbabilities.Add(stackedProbabilities[i - 1] + probs[i]);
 
+		// should be 100%
 		sumOfRankedFitness += probs[i];
 	}
 
-	for (int i = 0; i < maxPairs; i++)
+	// Loop though maxPairs to select all parent pairs
+	for (int i = 0; i < m_iMaxPairs; i++)
 	{
+		// Generate a random number for each parent selection between 1 and sum of fitness (should be 100)
 		int r1 = FMath::RandRange(1, sumOfRankedFitness);
 		int r2 = FMath::RandRange(1, sumOfRankedFitness);
 
 		FPair parentPair;
 
-		for (int j = 0; j < tempVec.Num(); j++)
-		{
-			if (tempVec[j] >= (double)r1)
+		for (int j = 0; j < stackedProbabilities.Num(); j++)
+		{	
+			// If the random number generated falls within the probaility value of
+			// a population solution then add it to the pair object as one of the parents.
+			if (stackedProbabilities[j] >= (double)r1)
 			{
-				parentPair.p1 = questMgr->vpPopulation[j];
+				parentPair.p1 = m_pQuestMgr->vpPopulation[j];
 				break;
 			}
 		}
 
-		for (int j = 0; j < tempVec.Num(); j++)
+		// If the random number generated falls within the probaility value of
+		// a population solution then add it to the pair object as one of the parents.
+		for (int j = 0; j < stackedProbabilities.Num(); j++)
 		{
-			if (tempVec[j] >= (double)r2)
+			if (stackedProbabilities[j] >= (double)r2)
 			{
-				parentPair.p2 = questMgr->vpPopulation[j];
+				parentPair.p2 = m_pQuestMgr->vpPopulation[j];
 				break;
 			}
 		}
 
+		// if parents are the same solution then repeat the selection process
 		if (parentPair.p1 == parentPair.p2)
 			i--;
 		else
 			// add the parent pair to the parent vector
-			parents.Add(parentPair);
+			m_aParents.Add(parentPair);
 	}
 
 }
 
 void UEvolutionManager::Combine()
 {
-	children.Empty();
+	m_aChildren.Empty();
 
-	for (int i = 0; i < parents.Num(); i++)
+	for (int i = 0; i < m_aParents.Num(); i++)
 	{
+		// Create the two new children
 		UQuest* child1 = NewObject<UQuest>();
 		UQuest* child2 = NewObject<UQuest>();
 		
-		parents[i].c1 = child1;
-		parents[i].c2 = child2;
+		m_aParents[i].c1 = child1;
+		m_aParents[i].c2 = child2;
 
-		child1->Init(parents[i].p1->distBand, parents[i].p1->type, L"Quest? 1", questMgr);
-		child2->Init(parents[i].p2->distBand, parents[i].p2->type, L"Quest? 2", questMgr);
+		// Initialise children quests using elements of the parents
+		child1->Init(m_aParents[i].p1->m_eDistBand, m_aParents[i].p1->m_eType, L"Quest? 1", m_pQuestMgr);
+		child2->Init(m_aParents[i].p2->m_eDistBand, m_aParents[i].p2->m_eType, L"Quest? 2", m_pQuestMgr);
 
 
-		// Update child solutions distance information
-		child1->SetDistanceFromPlayer(player->GetActorLocation());
-		child2->SetDistanceFromPlayer(player->GetActorLocation());
+		// Update child solutions distance, name and description information
+		child1->SetDistanceFromPlayer(m_pPlayer->GetActorLocation());
+		child2->SetDistanceFromPlayer(m_pPlayer->GetActorLocation());
 		child1->setDistName();
 		child2->setDistName();
 
@@ -449,17 +444,17 @@ void UEvolutionManager::Combine()
 		child2->setDescription();
 
 		// Add children to the children vector
-		children.Add(child1);
-		children.Add(child2);
+		m_aChildren.Add(child1);
+		m_aChildren.Add(child2);
 	}
 }
 
 void UEvolutionManager::CalculateFrequencySel(Ffrequency_Count* count)
 {
-
-	for (int i = 0; i < children.Num(); i++)
+	// Loop which caounts the the amount of each quest type element in the current population
+	for (int i = 0; i < m_aChildren.Num(); i++)
 	{
-		switch (children[i]->type)
+		switch (m_aChildren[i]->m_eType)
 		{
 		case TP_KILL:
 			count->KillCount++;
@@ -475,7 +470,7 @@ void UEvolutionManager::CalculateFrequencySel(Ffrequency_Count* count)
 			break;
 		}
 
-		switch (children[i]->distBand)
+		switch (m_aChildren[i]->m_eDistBand)
 		{
 		case DIST_CLOSE:
 			count->CloseCount++;
@@ -489,18 +484,22 @@ void UEvolutionManager::CalculateFrequencySel(Ffrequency_Count* count)
 		}
 	}
 
-	count->KillFreq		= ((float)count->KillCount	/ (float)children.Num()) * 100;
-	count->GatherFreq	= ((float)count->GatherCount/ (float)children.Num()) * 100;
-	count->FetchFreq	= ((float)count->FetchCount	/ (float)children.Num()) * 100;
-	count->ExploreFreq	= ((float)count->ExploreCount/ (float)children.Num()) * 100;
+	// Calculate the amount each type element appears in the population as a percentage
+	count->KillFreq		= ((float)count->KillCount	/ (float)m_aChildren.Num()) * 100;
+	count->GatherFreq	= ((float)count->GatherCount/ (float)m_aChildren.Num()) * 100;
+	count->FetchFreq	= ((float)count->FetchCount	/ (float)m_aChildren.Num()) * 100;
+	count->ExploreFreq	= ((float)count->ExploreCount/ (float)m_aChildren.Num()) * 100;
 
+	// Add the type frequencies to an array for later use
 	count->TypeFreqs.Add(count->KillFreq);
 	count->TypeFreqs.Add(count->GatherFreq);
 	count->TypeFreqs.Add(count->FetchFreq);
 	count->TypeFreqs.Add(count->ExploreFreq);
 
+	// Check for any quests type frequencies of zero. This indicates aloss of genetic material from the population
 	if (count->KillFreq == 0.0 || count->GatherFreq == 0.0 || count->FetchFreq == 0.0 || count->ExploreFreq == 0.0)
 	{
+		// Add any lost type enum values to a list for the mutation function to use later
 		if (count->KillFreq == 0.0)
 			count->LowTypeFreqs.Add((int)TP_KILL);
 		if (count->GatherFreq == 0.0)
@@ -510,21 +509,24 @@ void UEvolutionManager::CalculateFrequencySel(Ffrequency_Count* count)
 		if (count->ExploreFreq == 0.0)
 			count->LowTypeFreqs.Add((int)TP_EXPLORE);
 
-
-		count->highestType = count->TypeFreqs.Max();
+		// Set low frequency to true so that mutation is triggered
 		count->lowTypeFreq = true;
 	}
 
-	count->CloseFreq	= ((float)count->CloseCount	/ (float)children.Num())*100;
-	count->MidFreq		= ((float)count->MidCount	/ (float)children.Num())*100;
-	count->FarFreq		= ((float)count->FarCount	/ (float)children.Num())*100;
+	// Calculate the amount each distance element appears in the population as a percentage
+	count->CloseFreq	= ((float)count->CloseCount	/ (float)m_aChildren.Num())*100;
+	count->MidFreq		= ((float)count->MidCount	/ (float)m_aChildren.Num())*100;
+	count->FarFreq		= ((float)count->FarCount	/ (float)m_aChildren.Num())*100;
 	
+	// Add the type frequencies to an array for later use
 	count->DistFreqs.Add(count->CloseFreq);
 	count->DistFreqs.Add(count->MidFreq);
 	count->DistFreqs.Add(count->FarFreq);
 
+	// Check for any quests distance frequencies of zero. This indicates aloss of genetic material from the population
 	if (count->CloseFreq == 0.0 || count->MidFreq == 0.0 || count->FarFreq == 0.0)
 	{
+		// Add any lost distance enum values to a list for the mutation function to use later
 		if (count->CloseFreq == 0.0)
 			count->LowDistFreqs.Add((int)DIST_CLOSE);
 		if (count->MidFreq == 0.0)
@@ -532,48 +534,47 @@ void UEvolutionManager::CalculateFrequencySel(Ffrequency_Count* count)
 		if (count->FarFreq == 0.0)
 			count->LowDistFreqs.Add((int)DIST_FAR);
 
-		count->highestDist = count->DistFreqs.Max();
-
+		// Set low frequency to true so that mutation is triggered
 		count->lowDistFreq = true;
 	}
 }
 
 void UEvolutionManager::Mutate()
 {
-	//Ffrequency_Count tempCount;
-	CurrentFreqInfoSel = {};
+	// Create a container to hold the population frequency information
+	m_CurrentFreqInfoSel = {};
 
 	// Get frequency information 
-	CalculateFrequencySel(&CurrentFreqInfoSel);
+	CalculateFrequencySel(&m_CurrentFreqInfoSel);
 
 	// if an element type is missing add it back in as below
-	if (CurrentFreqInfoSel.lowTypeFreq || CurrentFreqInfoSel.lowDistFreq)
+	if (m_CurrentFreqInfoSel.lowTypeFreq || m_CurrentFreqInfoSel.lowDistFreq)
 	{
 		// misssing type element
-		if (CurrentFreqInfoSel.lowTypeFreq)
+		if (m_CurrentFreqInfoSel.lowTypeFreq)
 		{
 			// for each type element that is missing 
-			for (int i = 0; i < CurrentFreqInfoSel.LowTypeFreqs.Num(); i++)
+			for (int i = 0; i < m_CurrentFreqInfoSel.LowTypeFreqs.Num(); i++)
 			{
 				// add in 5 random ones
-				for (int j = 0; j < ReintroRate; j++)
+				for (int j = 0; j < m_iReintroRate; j++)
 				{
-					//geneerate a random index to change
-					int randIndex = FMath::RandRange(0, (children.Num() - 1));
+					//generate a random index to change
+					int randIndex = FMath::RandRange(0, (m_aChildren.Num() - 1));
 
 					// set it's type to the missing type
-					children[randIndex]->setType((QuestType)CurrentFreqInfoSel.LowTypeFreqs[i]);
+					m_aChildren[randIndex]->setType((QuestType)m_CurrentFreqInfoSel.LowTypeFreqs[i]);
 
-					children[randIndex]->setQuestName();
-					children[randIndex]->setDescription();
+					m_aChildren[randIndex]->setQuestName();
+					m_aChildren[randIndex]->setDescription();
 				}
 			}
 		}
 		// missing distance 
-		if (CurrentFreqInfoSel.lowDistFreq)
+		if (m_CurrentFreqInfoSel.lowDistFreq)
 		{	
 			// for each distance banding that is missing
-			for (int i = 0; i < CurrentFreqInfoSel.LowDistFreqs.Num(); i++)
+			for (int i = 0; i < m_CurrentFreqInfoSel.LowDistFreqs.Num(); i++)
 			{
 				int count = 0;
 				
@@ -581,7 +582,7 @@ void UEvolutionManager::Mutate()
 				int maxRadius = 0; 
 
 				//set the random number generater bounding based on missing dist type
-				switch(CurrentFreqInfoSel.LowDistFreqs[i])
+				switch(m_CurrentFreqInfoSel.LowDistFreqs[i])
 				{
 					case DIST_CLOSE:
 					{
@@ -606,10 +607,10 @@ void UEvolutionManager::Mutate()
 					}
 				}
 
-				while (count < ReintroRate)
+				while (count < m_iReintroRate)
 				{
 					// Generate random index 
-					int randIndex = FMath::RandRange(0, (children.Num()-1));
+					int randIndex = FMath::RandRange(0, (m_aChildren.Num()-1));
 
 					// Generate random angle
 					int randAngle = FMath::RandRange(0, 360);
@@ -621,15 +622,15 @@ void UEvolutionManager::Mutate()
 					int newY = randOffset * sin(randAngle); // FMath::RandRange(-2000, 2000);
 
 					// set x and y cords
-					children[randIndex]->setLocation(FVector(newX, newY, 130));
+					m_aChildren[randIndex]->setLocation(FVector(newX, newY, 130));
 					
 
 					// Update quest location data
-					children[randIndex]->SetDistanceFromPlayer(player->GetActorLocation());
+					m_aChildren[randIndex]->SetDistanceFromPlayer(m_pPlayer->GetActorLocation());
 
-					children[randIndex]->setDistName();
-					children[randIndex]->setQuestName();
-					children[randIndex]->setDescription();
+					m_aChildren[randIndex]->setDistName();
+					m_aChildren[randIndex]->setQuestName();
+					m_aChildren[randIndex]->setDescription();
 
 					count++;
 				}
@@ -645,70 +646,69 @@ void UEvolutionManager::Survive()
 	TArray<UQuest*> tempNewPop;
 
 	// Evaluate the child solution so that all fittnesses are updated
-	for (int i = 0; i < children.Num(); i++)
-		Evaluate(children[i]);
+	for (int i = 0; i < m_aChildren.Num(); i++)
+		Evaluate(m_aChildren[i]);
 
 	// Loop through the current population and include quests accepted but 
 	// not completed in the next generation by default
-	for (int i = 0; i < questMgr->vpPopulation.Num(); i++)
+	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
 	{
-		if (questMgr->vpPopulation[i]->status == ST_ACCEPTED)
-			tempNewPop.Add(questMgr->vpPopulation[i]);
+		if (m_pQuestMgr->vpPopulation[i]->m_eStatus == ST_ACCEPTED)
+			tempNewPop.Add(m_pQuestMgr->vpPopulation[i]);
 	}
 
+	// Array to hold the population sorted by fitness
 	TArray<UQuest*> tempSortPop;
 
-	TArray<double> tempVec;
+	// Add all children to the sort array
+	for (int i = 0; i < m_aChildren.Num(); i++)
+		tempSortPop.Add(m_aChildren[i]);
 
-	//for (int i = 0; i < questMgr->vpPopulation.Num(); i++)
-	//	tempSortPop.Add(questMgr->vpPopulation[i]);
+	// Sort the array using a basic lambda function
+	tempSortPop.Sort([](const UQuest& a, const UQuest& b) { return a.m_iTotalFitness < b.m_iTotalFitness; });
 
-	for (int i = 0; i < children.Num(); i++)
-		tempSortPop.Add(children[i]);
-
-	tempSortPop.Sort([](const UQuest& a, const UQuest& b) { return a.totalFitness < b.totalFitness; });
-
+	// calculates the total sum of all the ranked positions in the array (eg an array of 4 is 10 as 1+2+3+4 = 10)
 	double sumOfRanks = ((double)tempSortPop.Num() + 1) * ((double)tempSortPop.Num() / 2);
 
 	TArray<double> probs;
 
 	for (int i = 0; i < tempSortPop.Num(); i++)
 	{
-		double rank = i + 1;
-		double pr = (rank / sumOfRanks);
-		double prob = (rank / sumOfRanks) * 100;
+		//calculates ranks probablility i = rank
+		double prob = ((i + 1) / sumOfRanks) * 100;
 		probs.Add(prob);
 	}
 
+	TArray<double> stackedProbabilities;
 	double sumOfRankedFitness = 0;
 
 	// Loop through the population and increment the sum of fitness values accordingly
 	for (int i = 0; i < probs.Num(); i++)
 	{
 		if (i == 0)
-			tempVec.Add(probs[i]);
+			stackedProbabilities.Add(probs[i]);
 		else
-			tempVec.Add(tempVec[i - 1] + probs[i]);
+			stackedProbabilities.Add(stackedProbabilities[i - 1] + probs[i]);
 
 		sumOfRankedFitness += probs[i];
 	}
 
 	// Loop though the remaining space in the next generation and select at random
 	// the children that will be added based on their fitness proportionate probailities
-	while(tempNewPop.Num() < maxPopulation)
+	while(tempNewPop.Num() < m_iMaxPopulation)
 	{
 		int r1 = FMath::RandRange(1, sumOfRankedFitness);
 
 		int tempNewPopSize = tempNewPop.Num();
 
-		for (int j = 0; j < tempVec.Num(); j++)
+		for (int j = 0; j < stackedProbabilities.Num(); j++)
 		{
-			if (tempVec[j] >= (double)r1)
+			if (stackedProbabilities[j] >= (double)r1)
 			{
 				int addedCheck = tempNewPop.Num();
 
 				if (tempNewPop.AddUnique(tempSortPop[j]) == addedCheck)
-					tempSortPop[j]->chosen = true;
+					tempSortPop[j]->m_bChosen = true;
 
 				break;
 			}
@@ -716,19 +716,19 @@ void UEvolutionManager::Survive()
 	}
 
 	// Empty the quest managers population list
-	questMgr->vpPopulation.Empty();
+	m_pQuestMgr->vpPopulation.Empty();
 
 	// Add the new generation to the quest manager
 	for (int i = 0; i < tempNewPop.Num(); i++)
-		questMgr->vpPopulation.Add(tempNewPop[i]);
+		m_pQuestMgr->vpPopulation.Add(tempNewPop[i]);
 }
 
 void UEvolutionManager::CalculateFrequencyFin(Ffrequency_Count* count)
 {
 
-	for (int i = 0; i < questMgr->vpPopulation.Num(); i++)
+	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
 	{
-		switch (questMgr->vpPopulation[i]->type)
+		switch (m_pQuestMgr->vpPopulation[i]->m_eType)
 		{
 		case TP_KILL:
 			count->KillCount++;
@@ -744,7 +744,7 @@ void UEvolutionManager::CalculateFrequencyFin(Ffrequency_Count* count)
 			break;
 		}
 
-		switch (questMgr->vpPopulation[i]->distBand)
+		switch (m_pQuestMgr->vpPopulation[i]->m_eDistBand)
 		{
 		case DIST_CLOSE:
 			count->CloseCount++;
@@ -758,19 +758,19 @@ void UEvolutionManager::CalculateFrequencyFin(Ffrequency_Count* count)
 		}
 	}
 
-	count->KillFreq = ((float)count->KillCount / (float)questMgr->vpPopulation.Num()) * 100;
-	count->GatherFreq = ((float)count->GatherCount / (float)questMgr->vpPopulation.Num()) * 100;
-	count->FetchFreq = ((float)count->FetchCount / (float)questMgr->vpPopulation.Num()) * 100;
-	count->ExploreFreq = ((float)count->ExploreCount / (float)questMgr->vpPopulation.Num()) * 100;
+	count->KillFreq = ((float)count->KillCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
+	count->GatherFreq = ((float)count->GatherCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
+	count->FetchFreq = ((float)count->FetchCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
+	count->ExploreFreq = ((float)count->ExploreCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 
 	count->TypeFreqs.Add(count->KillFreq);
 	count->TypeFreqs.Add(count->GatherFreq);
 	count->TypeFreqs.Add(count->FetchFreq);
 	count->TypeFreqs.Add(count->ExploreFreq);
 
-	count->CloseFreq = ((float)count->CloseCount / (float)questMgr->vpPopulation.Num()) * 100;
-	count->MidFreq = ((float)count->MidCount / (float)questMgr->vpPopulation.Num()) * 100;
-	count->FarFreq = ((float)count->FarCount / (float)questMgr->vpPopulation.Num()) * 100;
+	count->CloseFreq = ((float)count->CloseCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
+	count->MidFreq = ((float)count->MidCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
+	count->FarFreq = ((float)count->FarCount / (float)m_pQuestMgr->vpPopulation.Num()) * 100;
 
 	count->DistFreqs.Add(count->CloseFreq);
 	count->DistFreqs.Add(count->MidFreq);
@@ -781,39 +781,39 @@ void UEvolutionManager::DisplayChangeSel()
 {
 	//% increase = (Increase ÷ Original Number) × 100.
 
-	if (PreviousFreqInfoSel.TypeFreqs.Num() == 0)
+	if (m_PreviousFreqInfoSel.TypeFreqs.Num() == 0)
 		return;
 
 	TArray<float> percentIncrease;
 
-	for (int i = 0; i < CurrentFreqInfoSel.TypeFreqs.Num(); i++)
+	for (int i = 0; i < m_CurrentFreqInfoSel.TypeFreqs.Num(); i++)
 	{
-		float increase = CurrentFreqInfoSel.TypeFreqs[i] - PreviousFreqInfoSel.TypeFreqs[i];
+		float increase = m_CurrentFreqInfoSel.TypeFreqs[i] - m_PreviousFreqInfoSel.TypeFreqs[i];
 
-		float percentInc = (increase / CurrentFreqInfoSel.TypeFreqs[i]) * 100;
+		float percentInc = (increase / m_CurrentFreqInfoSel.TypeFreqs[i]) * 100;
 
 		//FString temp = FString::SanitizeFloat(percentInc);
 
 		percentIncrease.Add(percentInc);
 	}
 
-	CurrentFreqInfoSel.KillChange		= percentIncrease[0];
-	CurrentFreqInfoSel.GatherChange		= percentIncrease[1];
-	CurrentFreqInfoSel.FetchChange		= percentIncrease[2];
-	CurrentFreqInfoSel.ExploreChange	= percentIncrease[3];
+	m_CurrentFreqInfoSel.KillChange		= percentIncrease[0];
+	m_CurrentFreqInfoSel.GatherChange	= percentIncrease[1];
+	m_CurrentFreqInfoSel.FetchChange	= percentIncrease[2];
+	m_CurrentFreqInfoSel.ExploreChange	= percentIncrease[3];
 
-	for (int i = 0; i < CurrentFreqInfoSel.DistFreqs.Num(); i++)
+	for (int i = 0; i < m_CurrentFreqInfoSel.DistFreqs.Num(); i++)
 	{
-		float increase = CurrentFreqInfoSel.DistFreqs[i] - PreviousFreqInfoSel.DistFreqs[i];
+		float increase = m_CurrentFreqInfoSel.DistFreqs[i] - m_PreviousFreqInfoSel.DistFreqs[i];
 
-		float percentInc = (increase / CurrentFreqInfoSel.DistFreqs[i]) * 100;
+		float percentInc = (increase / m_CurrentFreqInfoSel.DistFreqs[i]) * 100;
 
 		percentIncrease.Add(percentInc);
 	}
 
-	CurrentFreqInfoSel.CloseChange = percentIncrease[4];
-	CurrentFreqInfoSel.MidChange = percentIncrease[5];
-	CurrentFreqInfoSel.FarChange = percentIncrease[6];
+	m_CurrentFreqInfoSel.CloseChange = percentIncrease[4];
+	m_CurrentFreqInfoSel.MidChange = percentIncrease[5];
+	m_CurrentFreqInfoSel.FarChange = percentIncrease[6];
 
 
 	/*if (GEngine)
@@ -860,44 +860,44 @@ void UEvolutionManager::DisplayChangeFin()
 	//% increase = (Increase ÷ Original Number) × 100.
 
 		//Ffrequency_Count tempCount;
-	CurrentFreqInfoFin = {};
+	m_CurrentFreqInfoFin = {};
 
 	// Get frequency information 
-	CalculateFrequencyFin(&CurrentFreqInfoFin);
+	CalculateFrequencyFin(&m_CurrentFreqInfoFin);
 
-	if (PreviousFreqInfoFin.TypeFreqs.Num() == 0)
+	if (m_PreviousFreqInfoFin.TypeFreqs.Num() == 0)
 		return;
 
 	TArray<float> percentIncreaseFin;
 
-	for (int i = 0; i < CurrentFreqInfoFin.TypeFreqs.Num(); i++)
+	for (int i = 0; i < m_CurrentFreqInfoFin.TypeFreqs.Num(); i++)
 	{
-		float increase = CurrentFreqInfoFin.TypeFreqs[i] - PreviousFreqInfoFin.TypeFreqs[i];
+		float increase = m_CurrentFreqInfoFin.TypeFreqs[i] - m_PreviousFreqInfoFin.TypeFreqs[i];
 
-		float percentInc = (increase / CurrentFreqInfoFin.TypeFreqs[i]) * 100;
+		float percentInc = (increase / m_CurrentFreqInfoFin.TypeFreqs[i]) * 100;
 
 		//FString temp = FString::SanitizeFloat(percentInc);
 
 		percentIncreaseFin.Add(percentInc);
 	}
 
-	CurrentFreqInfoFin.KillChange = percentIncreaseFin[0];
-	CurrentFreqInfoFin.GatherChange = percentIncreaseFin[1];
-	CurrentFreqInfoFin.FetchChange = percentIncreaseFin[2];
-	CurrentFreqInfoFin.ExploreChange = percentIncreaseFin[3];
+	m_CurrentFreqInfoFin.KillChange = percentIncreaseFin[0];
+	m_CurrentFreqInfoFin.GatherChange = percentIncreaseFin[1];
+	m_CurrentFreqInfoFin.FetchChange = percentIncreaseFin[2];
+	m_CurrentFreqInfoFin.ExploreChange = percentIncreaseFin[3];
 
-	for (int i = 0; i < CurrentFreqInfoFin.DistFreqs.Num(); i++)
+	for (int i = 0; i < m_CurrentFreqInfoFin.DistFreqs.Num(); i++)
 	{
-		float increase = CurrentFreqInfoFin.DistFreqs[i] - PreviousFreqInfoFin.DistFreqs[i];
+		float increase = m_CurrentFreqInfoFin.DistFreqs[i] - m_PreviousFreqInfoFin.DistFreqs[i];
 
-		float percentInc = (increase / CurrentFreqInfoFin.DistFreqs[i]) * 100;
+		float percentInc = (increase / m_CurrentFreqInfoFin.DistFreqs[i]) * 100;
 
 		percentIncreaseFin.Add(percentInc);
 	}
 
-	CurrentFreqInfoFin.CloseChange = percentIncreaseFin[4];
-	CurrentFreqInfoFin.MidChange = percentIncreaseFin[5];
-	CurrentFreqInfoFin.FarChange = percentIncreaseFin[6];
+	m_CurrentFreqInfoFin.CloseChange = percentIncreaseFin[4];
+	m_CurrentFreqInfoFin.MidChange = percentIncreaseFin[5];
+	m_CurrentFreqInfoFin.FarChange = percentIncreaseFin[6];
 
 
 	/*if (GEngine)
@@ -951,7 +951,7 @@ void UEvolutionManager::CalculateData(int gen, int stage, TArray<UQuest*> &quest
 
 	for (int i = 0; i < questArray.Num(); i++)
 	{
-		switch (questArray[i]->type)
+		switch (questArray[i]->m_eType)
 		{
 		case TP_KILL:
 			killTot++;
@@ -967,7 +967,7 @@ void UEvolutionManager::CalculateData(int gen, int stage, TArray<UQuest*> &quest
 			break;
 		}
 
-		switch (questArray[i]->distBand)
+		switch (questArray[i]->m_eDistBand)
 		{
 		case DIST_CLOSE:
 			closeTot++;
@@ -993,8 +993,6 @@ void UEvolutionManager::CalculateData(int gen, int stage, TArray<UQuest*> &quest
 	tempData.PercentageClose	=	closeTot / questArray.Num();
 	tempData.PercentageMid		=	midTot / questArray.Num();
 	tempData.PercentageFar		=	farTot / questArray.Num();
-		
-
 }
 
 void UEvolutionManager::OutputResult()
@@ -1013,49 +1011,49 @@ void UEvolutionManager::OutputResult()
 	FileContent += FString::FromInt(CurrentFreqInfoSel.KillFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Kill_Fitness);
+	FileContent += FString::FromInt(player->style->m_iKill_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FETCH,");
 	FileContent += FString::FromInt(CurrentFreqInfoSel.FetchFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Fetch_Fitness);
+	FileContent += FString::FromInt(player->style->m_iFetch_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("GATHER,");
 	FileContent += FString::FromInt(CurrentFreqInfoSel.GatherFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Gather_Fitness);
+	FileContent += FString::FromInt(player->style->m_iGather_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("EXPLORE,");
 	FileContent += FString::FromInt(CurrentFreqInfoSel.ExploreFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Explore_Fitness);
+	FileContent += FString::FromInt(player->style->m_iExplore_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("CLOSE,");
 	FileContent += FString::FromInt(CurrentFreqInfoSel.CloseFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Close_Fitness);
+	FileContent += FString::FromInt(player->style->m_iClose_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("MID,");
 	FileContent += FString::FromInt(CurrentFreqInfoSel.MidFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Mid_Fitness);
+	FileContent += FString::FromInt(player->style->m_iMid_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FAR,");
 	FileContent += FString::FromInt(CurrentFreqInfoSel.FarFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Far_Fitness);
+	FileContent += FString::FromInt(player->style->m_iFar_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FINAL STAGE \n");
@@ -1065,49 +1063,49 @@ void UEvolutionManager::OutputResult()
 	FileContent += FString::FromInt(CurrentFreqInfoFin.KillFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Kill_Fitness);
+	FileContent += FString::FromInt(player->style->m_iKill_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FETCH,");
 	FileContent += FString::FromInt(CurrentFreqInfoFin.FetchFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Fetch_Fitness);
+	FileContent += FString::FromInt(player->style->m_iFetch_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("GATHER,");
 	FileContent += FString::FromInt(CurrentFreqInfoFin.GatherFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Gather_Fitness);
+	FileContent += FString::FromInt(player->style->m_iGather_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("EXPLORE,");
 	FileContent += FString::FromInt(CurrentFreqInfoFin.ExploreFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Explore_Fitness);
+	FileContent += FString::FromInt(player->style->m_iExplore_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("CLOSE,");
 	FileContent += FString::FromInt(CurrentFreqInfoFin.CloseFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Close_Fitness);
+	FileContent += FString::FromInt(player->style->m_iClose_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("MID,");
 	FileContent += FString::FromInt(CurrentFreqInfoFin.MidFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Mid_Fitness);
+	FileContent += FString::FromInt(player->style->m_iMid_Fitness);
 	FileContent += TEXT("\n");
 
 	FileContent += TEXT("FAR,");
 	FileContent += FString::FromInt(CurrentFreqInfoFin.FarFreq);
 	FileContent += TEXT(",%,");
 	FileContent += TEXT("FITNESS,");
-	FileContent += FString::FromInt(player->style->Far_Fitness);
+	FileContent += FString::FromInt(player->style->m_iFar_Fitness);
 	FileContent += TEXT("\n");
 
 	FFileHelper::SaveStringToFile(FileContent, *FilePath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);

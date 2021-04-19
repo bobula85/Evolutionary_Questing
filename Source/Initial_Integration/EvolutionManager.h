@@ -10,8 +10,7 @@ class AInitial_IntegrationCharacter;
 class UQuestManager;
 class UQuest;
 
-// holds pointers to a pair of parents
-
+// Struct used to contain all population statistical data
 USTRUCT(BlueprintType)
 struct Ffrequency_Count
 {
@@ -20,158 +19,112 @@ struct Ffrequency_Count
 ///////////////////////////		Selection Population Stats		/////////////////////////////////////////////
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int KillCount = 0;
+	int KillCount = 0;			/**< Integer value of total number of kill quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float KillFreq = 0;
+	float KillFreq = 0;			/**< Float value of kill quests frequency in the population */
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float KillChange = 0;
+	float KillChange = 0;		/**< Float value of change to kill quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int FetchCount = 0;
+	int FetchCount = 0;			/**< Integer value of total number of fetch quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float FetchFreq = 0;
+	float FetchFreq = 0;		/**< Float value of fetch quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float FetchChange = 0;
+	float FetchChange = 0;		/**< Float value of change to fetch quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int GatherCount = 0;
+	int GatherCount = 0;		/**< Integer value of total number of gather quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float GatherFreq = 0;
+	float GatherFreq = 0;		/**< Float value of gather quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float GatherChange = 0;
+	float GatherChange = 0;		/**< Float value of change to gather quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int ExploreCount = 0;
+	int ExploreCount = 0;		/**< Integer value of total number of explore quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float ExploreFreq = 0;
+	float ExploreFreq = 0;		/**< Float value of expolre quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float ExploreChange = 0;
+	float ExploreChange = 0;	/**< Float value of change to explore quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int CloseCount = 0;
+	int CloseCount = 0;			/**< Integer value of total number of close quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float CloseFreq = 0;
+	float CloseFreq = 0;		/**< Float value of close quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float CloseChange = 0;
+	float CloseChange = 0;		/**< Float value of change to close quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int MidCount = 0;
+	int MidCount = 0;			/**< Integer value of total number of mid quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float MidFreq = 0;
+	float MidFreq = 0;			/**< Float value of mid quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float MidChange = 0;
+	float MidChange = 0;		/**< Float value of change to mid quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int FarCount = 0;
+	int FarCount = 0;			/**< Integer value of total number of far quests */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float FarFreq = 0;
+	float FarFreq = 0;			/**< Float value of far quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	float FarChange = 0;
+	float FarChange = 0;		/**< Float value of change to far quests frequency in the population */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	bool lowTypeFreq = false;
+	bool lowTypeFreq = false;	/**< Bool value used to show low frequency of a quest type */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	bool lowDistFreq = false; 
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	TArray<int> LowTypeFreqs;
+	bool lowDistFreq = false;	/**< Bool value used to show low frequency of a quest distance */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	TArray<int> LowDistFreqs;
+	TArray<int> LowTypeFreqs;	/**< Array of low type frequencies */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	TArray<float> TypeFreqs;
+	TArray<int> LowDistFreqs;	/**< Array of low distance frequencies */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	TArray<float> DistFreqs;
+	TArray<float> TypeFreqs;	/**< Array of all type frequencies */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int highestType;
+	TArray<float> DistFreqs;	/**< Array of all distance frequencies */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
-	int highestDist;
+	int highestType;			/**< Array of all distance frequencies */
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoFreqCount")
+	int highestDist;			/**< Array of all distance frequencies */
 };
 
+/**< Data strucute that hold a pair of parent quests and the two resulting child quests */
 USTRUCT(BlueprintType)
 struct FPair
 {
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	UQuest* p1;
+	UQuest* p1;					/**< Quest poniter to parent quest 1 */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	UQuest* p2;
+	UQuest* p2;					/**< Quest poniter to parent quest 2 */
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	UQuest* c1;
+	UQuest* c1;					/**< Quest poniter to child quest 1 */
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	UQuest* c2;
+	UQuest* c2;					/**< Quest poniter to child quest 2 */
 };
 
-USTRUCT(BlueprintType)
-struct FPair_SaveItem
-{
-	GENERATED_BODY()
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair_SaveItem")
-	int x;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair_SaveItem")
-	int y;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair_SaveItem")
-	int DistBanding;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair_SaveItem")
-	int Type;
-};
-
-USTRUCT(BlueprintType)
-struct FPair_SaveItems
-{
-	GENERATED_BODY()
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	FPair_SaveItem p1;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	FPair_SaveItem p2;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	FPair_SaveItem c1;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair")
-	FPair_SaveItem c2;
-};
-
-USTRUCT(BlueprintType)
-struct FPair_SaveGeneration
-{
-	GENERATED_BODY()
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair_SaveItem")
-	TArray<FPair_SaveItems> GenerationPairs;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoPair_SaveItem")
-	int GenerationNumber;
-};
 
 USTRUCT(BlueprintType)
 struct FGenerationData
@@ -215,26 +168,29 @@ class INITIAL_INTEGRATION_API UEvolutionManager : public UActorComponent
 	
 public:	
 
-	//UEvolutionManager();
-
-	// Sets default values for this actor's properties
+	//! A function initialises the evolution manager.
+	/*!
+		\param p a character pointer which allows access to the play style manager.
+		\param mgr a pointer to the quest manager.
+	*/
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void Init(AInitial_IntegrationCharacter* p, UQuestManager* mgr);
-	//! A function that initiates the evolutionary process.
+
+	//! A function which begins the evolutionary process.
 	/*!
+	* 
 	*/
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void EvolveQuests();
 
-	//! A function which evaluates the the populations solutions.
+	//! A function which evaluates a quests fitness values.
 	/*!
-		Takes the a pointer to the quest that requires evaluation.
-		\param qst a Quest pointer for quest object.
+		\param qst a Quest pointer for a quest object.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void Evaluate(UQuest* qst);
 
-	//! A function which selects parents usinf the roulette selection method.
+	//! A function which selects parents using the roulette wheele selection method.
 	/*!
 	*/
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
@@ -252,17 +208,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void Combine();
 
-	//! A function which calculates the frequecy of each quest element type.
+	//! A function which calculates the frequecy of each quest element type before survivor selection.
 	/*!
 	*/
 	void CalculateFrequencySel(Ffrequency_Count* count);
 
-	//! A function which calculates the frequecy of each quest element type.
+	//! A function which calculates the frequecy of each quest element type after the evolutionary process has finished.
 	/*!
 	*/
 	void CalculateFrequencyFin(Ffrequency_Count* count);
 
-	//! A function which creates new solutions from the parents selected in SelectionRoulette() and SelectRanked().
+	//! A function mutates a set amount of quests when some genetic material is lost (not selected for the next generation).
 	/*!
 	*/
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
@@ -274,8 +230,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void Survive();
 
+	//! A function which updates the frequency change values and displayes them depening on debug option
+	/*!
+	*/
 	void DisplayChangeSel();
 
+	//! A function which updates the frequency change values and displayes them depening on debug option
+	/*!
+	*/
 	void DisplayChangeFin();
 
 	//! A function outputs evolutionary data to a .csv file.
@@ -290,60 +252,51 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void CalculateData(int gen, int stage, TArray<UQuest*> &questArray);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	TArray<UQuest*> children;		/*!< A vector of type Quest* which holds the players accepted quests. */
+
+
+///////////////////////////////////////////////////		Variables		//////////////////////////////////////////////////////////////////////////////
+
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	TArray<FPair> parents;			/*!< A vector of type quest which holds the players accepted quests. */
+	TArray<UQuest*> m_aChildren;						/*!< A vector of type Quest* which holds the players accepted quests. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	AInitial_IntegrationCharacter* player;		/*!< A pointer of type Player* which holds the players accepted quests. */
+	TArray<FPair> m_aParents;							/*!< A vector of type quest which holds the players accepted quests. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	UQuestManager* questMgr;				/*!< A pointer of QuestManager* which holds all quest information. */
+	AInitial_IntegrationCharacter* m_pPlayer;			/*!< A pointer of type Player* which holds the players accepted quests. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	int maxPairs;				/*!< An integer which declares the maximum amount of mating pairs that can be selected for breeding. */
+	UQuestManager* m_pQuestMgr;							/*!< A pointer of QuestManager* which holds all quest information. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	int maxChildren;			/*!< An integer which declares the maximum amount of children that can be created per evolution. */
+	int m_iMaxPairs;									/*!< An integer which declares the maximum amount of mating pairs that can be selected for breeding. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	int maxPopulation;			/*!< An integer which declares the maximum size of the population. */
+	int m_iMaxChildren;									/*!< An integer which declares the maximum amount of children that can be created per evolution. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	int ReintroRate;			/*!< An integer used to trigger mutation of quest elements. */
+	int m_iMaxPopulation;								/*!< An integer which declares the maximum size of the population. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	int evolutionNumber; 				/*!< An integer which declares the total number of evolutions that have taken place so far. */
+	int m_iReintroRate;									/*!< An integer used to trigger mutation of quest elements. */
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
+	int m_iEvolutionNumber; 							/*!< An integer which declares the total number of evolutions that have taken place so far. */
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	TArray<FPair_SaveItem> EvoPairItems;			/*!< A vector of type quest which holds the players accepted quests. */
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	TArray<FPair_SaveGeneration> EvoGenerations;			/*!< A vector of type quest which holds the players accepted quests. */
+	TArray<FGenerationData> m_aEvoGenerationData;		/*!< A vector of type quest which holds the players accepted quests. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	TArray<FGenerationData> EvoGenerationData;			/*!< A vector of type quest which holds the players accepted quests. */
+	Ffrequency_Count m_CurrentFreqInfoSel;				/*!< A structure that holds the current populations frequency information prior to selection. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	Ffrequency_Count CurrentFreqInfoSel;					/*!< A structure that holds the current populations frequency information. */
+	Ffrequency_Count m_PreviousFreqInfoSel;				/*!< A structure that holds the previous populations frequency information prior to selection. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	Ffrequency_Count PreviousFreqInfoSel;					/*!< A structure that holds the previous populations frequency information. */
+	Ffrequency_Count m_CurrentFreqInfoFin;				/*!< A structure that holds the current populations frequency information at the end of an evolution. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	Ffrequency_Count CurrentFreqInfoFin;					/*!< A structure that holds the current populations frequency information. */
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
-	Ffrequency_Count PreviousFreqInfoFin;					/*!< A structure that holds the previous populations frequency information. */
-
-protected:
-	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
-
+	Ffrequency_Count m_PreviousFreqInfoFin;				/*!< A structure that holds the previous populations frequency information at the end of an evolution. */
 };

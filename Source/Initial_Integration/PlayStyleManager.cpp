@@ -9,105 +9,92 @@ void UPlayStyleManager::Init()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
 
-	compMultiplier = 1.2;
-	inCompMultiplier = 1.0;
-	abnMultiplier = 0.8;
-	rejMultiplier = 1.3;
+	m_dCompMultiplier = 1.2;
+	m_dCompMultiplier = 1.0;
+	m_dAbnMultiplier = 0.8;
+	m_dRejMultiplier = 1.3;
 
 	int baseValue = 1; 
 
 	// Initiale all player preference statistics to 1
-	Kill_Com = baseValue;
-	Gather_Com = baseValue;
-	Fetch_Com = baseValue;
-	Explore_Com = baseValue;
+	m_iKill_Com = baseValue;
+	m_iGather_Com = baseValue;
+	m_iFetch_Com = baseValue;
+	m_iExplore_Com = baseValue;
 
-	Kill_InCom = baseValue;
-	Gather_InCom = baseValue;
-	Fetch_InCom = baseValue;
-	Explore_InCom = baseValue;
+	m_iKill_InCom = baseValue;
+	m_iGather_InCom = baseValue;
+	m_iFetch_InCom = baseValue;
+	m_iExplore_InCom = baseValue;
 
-	Kill_Abn = baseValue;
-	Gather_Abn = baseValue;
-	Fetch_Abn = baseValue;
-	Explore_Abn = baseValue;
+	m_iKill_Abn = baseValue;
+	m_iGather_Abn = baseValue;
+	m_iFetch_Abn = baseValue;
+	m_iExplore_Abn = baseValue;
 
-	Kill_Rej = baseValue;
-	Gather_Rej = baseValue;
-	Fetch_Rej = baseValue;
-	Explore_Rej = baseValue;
+	m_iKill_Rej = baseValue;
+	m_iGather_Rej = baseValue;
+	m_iFetch_Rej = baseValue;
+	m_iExplore_Rej = baseValue;
 
-	Close_Com = baseValue;
-	Mid_Com = baseValue;
-	Far_Com = baseValue;
+	m_iClose_Com = baseValue;
+	m_iMid_Com = baseValue;
+	m_iFar_Com = baseValue;
 
-	Close_InCom = baseValue;
-	Mid_InCom = baseValue;
-	Far_InCom = baseValue;
+	m_iClose_InCom = baseValue;
+	m_iMid_InCom = baseValue;
+	m_iFar_InCom = baseValue;
 
-	Close_Abn = baseValue;
-	Mid_Abn = baseValue;
-	Far_Abn = baseValue;
+	m_iClose_Abn = baseValue;
+	m_iMid_Abn = baseValue;
+	m_iFar_Abn = baseValue;
 
-	Close_Rej = baseValue;
-	Mid_Rej = baseValue;
-	Far_Rej = baseValue;
+	m_iClose_Rej = baseValue;
+	m_iMid_Rej = baseValue;
+	m_iFar_Rej = baseValue;
 
 
-	Kill_Fitness = 1;
-	Gather_Fitness = 1;
-	Fetch_Fitness = 1;
-	Explore_Fitness = 1;
+	m_iKill_Fitness = 1;
+	m_iGather_Fitness = 1;
+	m_iFetch_Fitness = 1;
+	m_iExplore_Fitness = 1;
 	
-	Close_Fitness = 1;
-	Mid_Fitness = 1;
-	Far_Fitness = 1;
+	m_iClose_Fitness = 1;
+	m_iMid_Fitness = 1;
+	m_iFar_Fitness = 1;
 }
-
-// Called when the game starts or when spawned
-//void UPlayStyleManager::BeginPlay()
-//{
-//	Super::BeginPlay();
-	
-//}
-
-// Called every frame
-//void UPlayStyleManager::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-
-//}
 
 void UPlayStyleManager::CalculateFitness()
 {
-	// Calculate fitness using player preference statisics eg fitness = (((Completed*2) + Incomplete) - Abandoned - (Rejected*2))
-	Kill_Fitness = (((Kill_Com * compMultiplier) + Kill_InCom * inCompMultiplier) - ((Kill_Abn * abnMultiplier) + (Kill_Rej*rejMultiplier)));
-	if (Kill_Fitness <= 0)
-		Kill_Fitness = 1;
+	// Calculate fitness using player preference statisics eg fitness = (((Completed*?) + Incomplete*?) - Abandoned *? - (Rejected*?))
+	// Set to 1 if zero for roulette wheel selection purposes
+	m_iKill_Fitness = (((m_iKill_Com * m_dCompMultiplier) + m_iKill_InCom * m_dCompMultiplier) - ((m_iKill_Abn * m_dAbnMultiplier) + (m_iKill_Rej*m_dRejMultiplier)));
+	if (m_iKill_Fitness <= 0)
+		m_iKill_Fitness = 1;
 
-	Gather_Fitness = (((Gather_Com * compMultiplier) + Gather_InCom * inCompMultiplier) - ((Gather_Abn * abnMultiplier) + (Gather_Rej * rejMultiplier)));
-	if (Gather_Fitness <= 0)
-		Gather_Fitness = 1;
+	m_iGather_Fitness = (((m_iGather_Com * m_dCompMultiplier) + m_iGather_InCom * m_dCompMultiplier) - ((m_iGather_Abn * m_dAbnMultiplier) + (m_iGather_Rej * m_dRejMultiplier)));
+	if (m_iGather_Fitness <= 0)
+		m_iGather_Fitness = 1;
 
-	Fetch_Fitness = (((Fetch_Com * compMultiplier) + Fetch_InCom * inCompMultiplier) - ((Fetch_Abn * abnMultiplier) + (Fetch_Rej * rejMultiplier)));
-	if (Fetch_Fitness <= 0)
-		Fetch_Fitness = 1;
+	m_iFetch_Fitness = (((m_iFetch_Com * m_dCompMultiplier) + m_iFetch_InCom * m_dCompMultiplier) - ((m_iFetch_Abn * m_dAbnMultiplier) + (m_iFetch_Rej * m_dRejMultiplier)));
+	if (m_iFetch_Fitness <= 0)
+		m_iFetch_Fitness = 1;
 
-	Explore_Fitness = (((Explore_Com * compMultiplier) + Explore_InCom * inCompMultiplier) - ((Explore_Abn * abnMultiplier) + (Explore_Rej * rejMultiplier)));
-	if (Explore_Fitness <= 0)
-		Explore_Fitness = 1;
+	m_iExplore_Fitness = (((m_iExplore_Com * m_dCompMultiplier) + m_iExplore_InCom * m_dCompMultiplier) - ((m_iExplore_Abn * m_dAbnMultiplier) + (m_iExplore_Rej * m_dRejMultiplier)));
+	if (m_iExplore_Fitness <= 0)
+		m_iExplore_Fitness = 1;
 	
-	Close_Fitness = (((Close_Com * compMultiplier) + Close_InCom * inCompMultiplier) - ((Close_Abn * abnMultiplier) + (Close_Rej * rejMultiplier)));
-	if (Close_Fitness <= 0)
-		Close_Fitness = 1;
+	m_iClose_Fitness = (((m_iClose_Com * m_dCompMultiplier) + m_iClose_InCom * m_dCompMultiplier) - ((m_iClose_Abn * m_dAbnMultiplier) + (m_iClose_Rej * m_dRejMultiplier)));
+	if (m_iClose_Fitness <= 0)
+		m_iClose_Fitness = 1;
 
-	Mid_Fitness = (((Mid_Com * compMultiplier) + Mid_InCom * inCompMultiplier) - ((Mid_Abn * abnMultiplier) + (Mid_Rej * rejMultiplier)));
-	if (Mid_Fitness <= 0)
-		Mid_Fitness = 1;
+	m_iMid_Fitness = (((m_iMid_Com * m_dCompMultiplier) + m_iMid_InCom * m_dCompMultiplier) - ((m_iMid_Abn * m_dAbnMultiplier) + (m_iMid_Rej * m_dRejMultiplier)));
+	if (m_iMid_Fitness <= 0)
+		m_iMid_Fitness = 1;
 
-	Far_Fitness = (((Far_Com * compMultiplier) + Far_InCom * inCompMultiplier) - ((Far_Abn * abnMultiplier) + (Far_Rej * rejMultiplier)));
-	if (Far_Fitness <= 0)
-		Far_Fitness = 1;
+	m_iFar_Fitness = (((m_iFar_Com * m_dCompMultiplier) + m_iFar_InCom * m_dCompMultiplier) - ((m_iFar_Abn * m_dAbnMultiplier) + (m_iFar_Rej * m_dRejMultiplier)));
+	if (m_iFar_Fitness <= 0)
+		m_iFar_Fitness = 1;
 
 
 }

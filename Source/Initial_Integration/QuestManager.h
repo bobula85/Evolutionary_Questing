@@ -49,155 +49,154 @@ class INITIAL_INTEGRATION_API UQuest : public UActorComponent
 
 public:
 
-	//UQuest();
-
-	//! Quest Constructor.
+	//! Initialises the quests storage.
 	/*!
-		Cretes a quest and initialises its storage.
+		\param d		- enum used to set quest distance
+		\param typ		- enum used to set quest type
+		\param qName	- string used to set quests name
+		\param p		- pointer the the quest manager object
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void Init(TEnumAsByte<QuestDistance> d, TEnumAsByte<QuestType> typ, FString qName, UQuestManager* p);
 
-	//! Quest Destructor.
+	//! Destroys quest and removes all data.
 	/*!
-		Destroys quest and removes all data.
+		\param comQuest - pointer to quest to be compared to.
+		\return True if quest data is equal.
 	*/
-	//~UQuest();
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	bool Compare(UQuest *comQuest);
 
+	//! Overloads equal to operator using compare function.
+	/*!
+		\param comQuest - pointer to quest to be compared to
+		\return True if quest data is equal.
+	*/
+	bool operator==(UQuest* comQuest)
+	{
+		return Compare(comQuest);
+	}
+
 	//! A function which initialises a text value of the quest type.
 	/*!
-
+		
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setTypeName();
 
 	//! A function which initialises a text value of the quest type.
 	/*!
-
+		\param Typ - enum used for setting the quests type
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setType(QuestType Typ);
 
+	//! A function sets the location of the quest.
+	/*!
+		\param loc used for setting each element of the plcation
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setLocation(FVector loc);
 
-	//! A function which initialises a text value of the quest distance banding.
+	//! A function which initialises a text value of the quest distance banding (close, mid, far).
 	/*!
-
+		 
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setDistName();
 
-	//! A function which initialises a text value of the quest distance banding.
+	//!  A function which initialises a text value of the quest complete name (type + distance).
 	/*!
-
+		
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setQuestName();
 
-	//! A function which initialises a text value of the quest distance banding.
+	//! A function which sets the description text for the quest ( eg "got to the castle and slay the dragon")
 	/*!
-
+		
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setDescription();
 
 	//! A function which sets the quest status - AVAILABLE, ACCEPTED, COMPLETE, ABANDONED.
 	/*!
-		\param state of type UINT8.
+		\param state of type enum used to set the state of the quest.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void setState(TEnumAsByte<QuestStatus> state);
 
-	//! A function which sets the distance of the quest from the player and update banding.
+	//! A function which sets the distance of the quest from the player and update banding, name and description.
 	/*!
-		\param p of type Player.
+		\param playerPos - position used for distance calculation.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void SetDistanceFromPlayer(FVector playerPos);
 	
-	//! A function which Checks the distance away from the player of a point
-	/*!
-		\param p of type Player.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Quest")
-	int CheckDist(FVector playerPos, FVector newQuestPos);
+
+
+
+///////////////////////////////////////////////////		Variables		//////////////////////////////////////////////////////////////////////////////
+
+
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int x;						/**< Integer value x representing the quests x position. */
+	int m_iXPos;								/**< Integer value x representing the quests x position. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int y;						/**< Integer value y representing the quests y position. */
+	int m_iYPos;								/**< Integer value y representing the quests y position. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int z;						/**< Integer value z representing the quests y position. */
+	int m_iZPos;								/**< Integer value z representing the quests y position. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	FVector questLocation; 
+	FVector m_vQuestLocation;					/**< Vector of quests location. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	TEnumAsByte<QuestType> type;					/**< UINT8 value used for bit representation of quest type. */
+	TEnumAsByte<QuestType> m_eType;				/**< Enum value used for representation of quest type. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	TEnumAsByte<QuestStatus> status;					/**< Integer value status indicates the status of the quest (enum)*/
+	TEnumAsByte<QuestStatus> m_eStatus;			/**< Enum value used for representation of quest status (completed, available, accepted)*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	float distance;				/**< Integer value distance indicates the actual distance of the quest from the player*/
+	float m_fDistance;							/**< Float value indicates the actual distance of the quest from the player*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	TEnumAsByte<QuestDistance> distBand;				/**< Integer value status indicates the distance banding of the quest (enum)*/
+	TEnumAsByte<QuestDistance> m_eDistBand;		/**< Enum value used for representation of distance banding (close, mid, far).*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int totalFitness;			/**< integer value representing the quests total fitness*/
+	int m_iTotalFitness;						/**< Integer value representing the quests total fitness*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int typeElementFitness;		/**< integer value representing the fitness of the type element*/
+	int m_iTypeElementFitness;					/**< Integer value representing the fitness of the type element*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int distElementFitness;		/**< integer value representing the fitness of the distance element*/
+	int m_iDistElementFitness;					/**< Integer value representing the fitness of the distance element*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	FString questName;			/**< string value used to store the text of a quest name for diplay in the list box. */
+	FString m_sQuestName;						/**< String value used to store the text of a quest name for diplay in the text box. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	FString typeName;			/**< string value used to store the text of a quest type for diplay in the list box. */
+	FString m_sTypeName;						/**< String value used to store the text of a quest type for diplay in the text box. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	FString distName;			/**< string value used to store the text of a quest distance banding for diplay in the list box. */
+	FString m_sDistName;						/**< String value used to store the text of a quest distance name for diplay in the text box. */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	FString description;		/**< string value used to store the text of a quest distance banding for diplay in the list box. */
+	FString m_sDescription;						/**< String value used to store the text of a quest description for diplay in the text box. */
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	bool eventCreated;		/**< integer value representing the fitness of the distance element*/
+	bool m_bEventCreated;						/**< Bool value representing creation event*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	bool inCompleteAdded;		/**< integer value representing the fitness of the distance element*/
+	bool m_bInCompleteAdded;					/**< Bool value representing the addition of an incomplete quest*/
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	bool chosen;		/**< integer value representing the fitness of the distance element*/
+	bool m_bChosen;								/**< integer value representing the fitness of the distance element*/
 
-	UQuestManager* parent; 
+	UQuestManager* m_pParent;					/**< Pointer to the quest manager*/
 };
-
-
-struct less_than_fitness
-{
-	//! An inline function which sorts two quests by fitness.
-	/*!
-
-		\param q1 of type Quest*.
-		\param q2 of type Quest*.
-	*/
-	inline bool operator() (UQuest* q1, UQuest* q2)
-	{
-		return (q1->totalFitness < q2->totalFitness);
-	}
-};
-
-
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class INITIAL_INTEGRATION_API UQuestManager : public UActorComponent
@@ -205,41 +204,34 @@ class INITIAL_INTEGRATION_API UQuestManager : public UActorComponent
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
-
-	//UQuestManager();
-
-	//! A function which initialises the begining quest list.
-/*!
-	\param abandonQuest of type quest.
-	\return True if quest is abandoned.
-*/
+	//! A function which initialises the quest manager.
+	/*!
+		
+	*/
 	UFUNCTION(BlueprintCallable, Category = "QuestManagement")
 	void Init();
 
+	//! A function generates a random position within distance bounds.
+	/*!
+		\param distBounds - integer value used for setting max and min bounds (distance banding).
+		\return 2d vector used for x and y position
+	*/
 	FVector2D RandQuestPos(int distBounds);
 
 	//! A function which initialises a text value of the quest type.
 	/*!
-
+		\param Typ - integer value used for switching type.
+		\return string of type name
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	FString getTypeName(int Typ);
 
-	//! A function which tests the distance calculation.
-	/*!
 
-	*/
-	//void AQuestManager::TestDistanceCalc();
+
+///////////////////////////////////////////////////		Variables		//////////////////////////////////////////////////////////////////////////////
+
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestManagement")
-	TArray<UQuest*> vpPopulation;	 /*!< A vector of type quest which holds all currently existing quests. */
-
-protected:
-	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
-
+	TArray<UQuest*> vpPopulation;				/**< A vector of type quest pointer which holds all currently existing quests. */
 };

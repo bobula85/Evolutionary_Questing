@@ -134,75 +134,46 @@ FVector2D UQuestManager::RandQuestPos(int distBounds)
 }
 
 
-/*
-void AQuestManager::TestDistanceCalc()
-{
-	Player* p1 = new Player(1, 1);
-	Player* p2 = new Player(10, 10);
-	Player* p3 = new Player(6, 4);
-	Player* p4 = new Player(-1, -1);
-	Player* p5 = new Player(15, 15);
 
 
-	Quest* q1 = new Quest(0, 0, TP_KILL);
-	Quest* q2 = new Quest(6, 2, TP_KILL);
-	Quest* q3 = new Quest(4, 8, TP_KILL);
-	Quest* q4 = new Quest(-1, -1, TP_KILL);
-	Quest* q5 = new Quest(20, 10, TP_KILL);
 
-	TArray<int> results;
-
-	q1->SetDistanceFromPlayer(p1);
-	q2->SetDistanceFromPlayer(p2);
-	q3->SetDistanceFromPlayer(p3);
-	q4->SetDistanceFromPlayer(p4);
-	q5->SetDistanceFromPlayer(p5);
-
-	results.push_back(q1->distance);
-	results.push_back(q2->distance);
-	results.push_back(q3->distance);
-	results.push_back(q4->distance);
-	results.push_back(q5->distance);
-
-}
-*/
-///////////////////////////////		Quest	//////////////////////////////
+////////////////////////////////////////////////////////////////////////////		Quest	/////////////////////////////////////////////////////////////
 
 void UQuest::Init(TEnumAsByte<QuestDistance> d, TEnumAsByte<QuestType> typ, FString qName, UQuestManager* p)
 {
-	parent = p; 
+	m_pParent = p; 
 
-	FVector2D rand = parent->RandQuestPos(d);
+	FVector2D rand = m_pParent->RandQuestPos(d);
 	// Set quest x position
-	x = rand.X;
+	m_iXPos = rand.X;
 	// Set quest y position
-	y = rand.Y;
+	m_iYPos = rand.Y;
 
 	// Set quest y position
-	z = 130;
+	m_iZPos = 130;
 
-	questLocation = FVector(x, y, z);
+	m_vQuestLocation = FVector(m_iXPos, m_iYPos, m_iZPos);
 
-	eventCreated = false;
+	m_bEventCreated = false;
 
 	// Set quest type position
-	type = typ;
+	m_eType = typ;
 	// Initialise state to available
-	status = ST_AVAILABLE;
+	m_eStatus = ST_AVAILABLE;
 
-	questName = qName;
+	m_sQuestName = qName;
 
 	// Initialise the quest type name
 	setTypeName();
 	setDescription();
 	
-	inCompleteAdded = false; 
+	m_bInCompleteAdded = false; 
 }
 
 bool UQuest::Compare(UQuest* comQuest)
 {
 	// Compare two quests, return true if the same, false if different
-	if (comQuest->x == x && comQuest->y == y && comQuest->z == z && comQuest->type == type)
+	if (comQuest->m_iXPos == m_iXPos && comQuest->m_iYPos == m_iYPos && comQuest->m_iZPos == m_iZPos && comQuest->m_eType == m_eType)
 		return true;
 	else
 		return false;
@@ -211,53 +182,53 @@ bool UQuest::Compare(UQuest* comQuest)
 void UQuest::setTypeName()
 {
 	// Set quest name vaue based on type
-	switch (type)
+	switch (m_eType)
 	{
 	case TP_KILL:
-		typeName = L"Kill Quest";
+		m_sTypeName = L"Kill Quest";
 		break;
 	case TP_GATHER:
-		typeName = L"Gather Quest";
+		m_sTypeName = L"Gather Quest";
 		break;
 	case TP_FETCH:
-		typeName = L"Fetch Quest";
+		m_sTypeName = L"Fetch Quest";
 		break;
 	case TP_EXPLORE:
-		typeName = L"Explore Quest";
+		m_sTypeName = L"Explore Quest";
 		break;
 	}
 }
 
 void UQuest::setType(QuestType Typ)
 {
-	type = Typ;
+	m_eType = Typ;
 
 	setTypeName();
 }
 
 void UQuest::setLocation(FVector loc)
 {
-	questLocation = loc;
+	m_vQuestLocation = loc;
 
-	x = questLocation.X;
-	y = questLocation.Y;
-	z = 130;
+	m_iXPos = m_vQuestLocation.X;
+	m_iYPos = m_vQuestLocation.Y;
+	m_iZPos = 130;
 
 }
 
 void UQuest::setDistName()
 {
 	// Set distance banding name text by band
-	switch (distBand)
+	switch (m_eDistBand)
 	{
 	case DIST_CLOSE:
-		distName = L" (Close)";
+		m_sDistName = L" (Close)";
 		break;
 	case DIST_MID:
-		distName = L" (Mid)";
+		m_sDistName = L" (Mid)";
 		break;
 	case DIST_FAR:
-		distName = L" (Far)";
+		m_sDistName = L" (Far)";
 		break;
 	}
 }
@@ -269,47 +240,47 @@ void UQuest::setDescription()
 	switch (randOpener)
 	{
 	case 0:
-		description = TEXT("I have a mighty quest for a mighty worrier! Your travels will take you ");
+		m_sDescription = TEXT("I have a mighty quest for a mighty worrier! Your travels will take you ");
 		break;
 	case 1:
-		description = TEXT("Hello Adventurer! Might you aid me in a task? It's ");
+		m_sDescription = TEXT("Hello Adventurer! Might you aid me in a task? It's ");
 		break;
 	case 2:
-		description = TEXT("Hey you? Do me a favor will you? It's ");
+		m_sDescription = TEXT("Hey you? Do me a favor will you? It's ");
 		break;
 	case 3:
-		description = TEXT("If only there were someone who could help me.... Ah you there? I have a job for you! It's ");
+		m_sDescription = TEXT("If only there were someone who could help me.... Ah you there? I have a job for you! It's ");
 		break;
 	}
 
 	// Set distance banding name text by band
-	switch (distBand)
+	switch (m_eDistBand)
 	{
 	case DIST_CLOSE:
-		description += TEXT("only a short distance so pack light. ");
+		m_sDescription += TEXT("only a short distance so pack light. ");
 		break;
 	case DIST_MID:
-		description += TEXT("not too far. ");
+		m_sDescription += TEXT("not too far. ");
 		break;
 	case DIST_FAR:
-		description += TEXT("a great distance so be prepeared. ");
+		m_sDescription += TEXT("a great distance so be prepeared. ");
 		break;
 	}
 
 	// Set quest name vaue based on type
-	switch (type)
+	switch (m_eType)
 	{
 	case TP_KILL:
-		description += TEXT("When you arrive at your destination dispatch the swine that you find there! He served me cold tea this one time... there's no excuse for it!");
+		m_sDescription += TEXT("When you arrive at your destination dispatch the swine that you find there! He served me cold tea this one time... there's no excuse for it!");
 		break;
 	case TP_GATHER:
-		description += TEXT("Christmas is fast approaching and i need some good twigs for my reef! could you gather me some?");
+		m_sDescription += TEXT("Christmas is fast approaching and i need some good twigs for my reef! could you gather me some?");
 		break;
 	case TP_FETCH:
-		description += TEXT("Whilst out sinking some bevies with my bestie last night i misplaced my hoard or treasure... could you find it?");
+		m_sDescription += TEXT("Whilst out sinking some bevies with my bestie last night i misplaced my hoard or treasure... could you find it?");
 		break;
 	case TP_EXPLORE:
-		description += TEXT("I have been studying the contents of the rubbish looking stone houses that keep randomly appearing but recently one collapsed on my leg! Could you go explore that one for me?");
+		m_sDescription += TEXT("I have been studying the contents of the rubbish looking stone houses that keep randomly appearing but recently one collapsed on my leg! Could you go explore that one for me?");
 		break;
 	}
 }
@@ -320,35 +291,22 @@ void UQuest::setQuestName()
 
 	FString newName;
 
-	newName += typeName;
-	newName += distName;
-	questName = newName;
+	newName += m_sTypeName;
+	newName += m_sDistName;
+	m_sQuestName = newName;
 }
 
 void UQuest::setState(TEnumAsByte<QuestStatus> state)
 {
 	// Set quest state
-	status = state;
-}
-
-int UQuest::CheckDist(FVector playerPos, FVector newQuestPos /*int cx, int cy, int cz, int x, int y, int z */)
-{
-	int x1 = pow((newQuestPos.X - playerPos.X), 2);
-	int y1 = pow((newQuestPos.Y - playerPos.Y), 2);
-	int z1 = pow((newQuestPos.Z - playerPos.Z), 2);
-
-	//int val = (x1 + y1 + z1);
-
-	// distance between the centre  
-	// and given point 
-	return (x1 + y1 + z1);
+	m_eStatus = state;
 }
 
 void UQuest::SetDistanceFromPlayer(FVector playerPos)
 {
-	FVector questPos(x, y, z);
+	FVector questPos(m_iXPos, m_iYPos, m_iZPos);
 
-	distance = playerPos.Dist(playerPos, questPos); // Abs(Abs(p->pos_x - 1) - Abs(x - 1)) + (Abs(p->pos_y - 1) - Abs(y - 1));
+	m_fDistance = playerPos.Dist(playerPos, questPos);
 
 	//FString temp = FString::SanitizeFloat(distance);
 	
@@ -356,21 +314,21 @@ void UQuest::SetDistanceFromPlayer(FVector playerPos)
 	//	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Green, playerPos.ToString());
 
 	// Set the distance banding based on distance from player
-	if (distance > 0 && distance <= 1000)
+	if (m_fDistance > 0 && m_fDistance <= 1000)
 	{
-		distBand = DIST_CLOSE;
+		m_eDistBand = DIST_CLOSE;
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Green, L" close ");
 	}
-	else if (distance > 1000 && distance <= 2000)
+	else if (m_fDistance > 1000 && m_fDistance <= 2000)
 	{
-		distBand = DIST_MID;
+		m_eDistBand = DIST_MID;
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Green, L" mid ");
 	}
-	else if (distance > 2000)
+	else if (m_fDistance > 2000)
 	{
-		distBand = DIST_FAR;
+		m_eDistBand = DIST_FAR;
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Green, L" far ");
 	}
