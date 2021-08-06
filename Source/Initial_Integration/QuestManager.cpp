@@ -148,7 +148,7 @@ void UQuest::Init(TEnumAsByte<QuestDistance> d, TEnumAsByte<QuestType> typ, FStr
 	m_iXPos = rand.X;
 	// Set quest y position
 	m_iYPos = rand.Y;
-
+	 
 	// Set quest y position
 	m_iZPos = 130;
 
@@ -161,6 +161,9 @@ void UQuest::Init(TEnumAsByte<QuestDistance> d, TEnumAsByte<QuestType> typ, FStr
 	// Initialise state to available
 	m_eStatus = ST_AVAILABLE;
 
+	m_eTypeElement = ELEMENT_NULL;
+	m_eDistElement = ELEMENT_NULL;
+
 	m_sQuestName = qName;
 
 	// Initialise the quest type name
@@ -168,6 +171,8 @@ void UQuest::Init(TEnumAsByte<QuestDistance> d, TEnumAsByte<QuestType> typ, FStr
 	setDescription();
 	
 	m_bInCompleteAdded = false; 
+
+
 }
 
 bool UQuest::Compare(UQuest* comQuest)
@@ -186,15 +191,19 @@ void UQuest::setTypeName()
 	{
 	case TP_KILL:
 		m_sTypeName = L"Kill Quest";
+		m_eTypeElement = ELEMENT_KILL;
 		break;
 	case TP_GATHER:
 		m_sTypeName = L"Gather Quest";
+		m_eTypeElement = ELEMENT_GATHER;
 		break;
 	case TP_FETCH:
 		m_sTypeName = L"Fetch Quest";
+		m_eTypeElement = ELEMENT_FETCH;
 		break;
 	case TP_EXPLORE:
 		m_sTypeName = L"Explore Quest";
+		m_eTypeElement = ELEMENT_EXPLORE;
 		break;
 	}
 }
@@ -223,12 +232,15 @@ void UQuest::setDistName()
 	{
 	case DIST_CLOSE:
 		m_sDistName = L" (Close)";
+		m_eDistElement = ELEMENT_CLOSE;
 		break;
 	case DIST_MID:
 		m_sDistName = L" (Mid)";
+		m_eDistElement = ELEMENT_MID;
 		break;
 	case DIST_FAR:
 		m_sDistName = L" (Far)";
+		m_eDistElement = ELEMENT_FAR;
 		break;
 	}
 }

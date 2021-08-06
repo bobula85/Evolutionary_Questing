@@ -41,6 +41,19 @@ enum QuestType
 	TP_EXPLORE
 };
 
+UENUM(BlueprintType)
+enum QuestElements
+{
+	ELEMENT_NULL = 0,
+	ELEMENT_KILL,
+	ELEMENT_GATHER,
+	ELEMENT_FETCH,
+	ELEMENT_EXPLORE,
+	ELEMENT_CLOSE,
+	ELEMENT_MID,
+	ELEMENT_FAR
+};
+
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class INITIAL_INTEGRATION_API UQuest : public UActorComponent
 {
@@ -166,13 +179,13 @@ public:
 	TEnumAsByte<QuestDistance> m_eDistBand;		/**< Enum value used for representation of distance banding (close, mid, far).*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int m_iTotalFitness;						/**< Integer value representing the quests total fitness*/
+	float m_iTotalFitness;						/**< Integer value representing the quests total fitness*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int m_iTypeElementFitness;					/**< Integer value representing the fitness of the type element*/
+	float m_iTypeElementFitness;					/**< Integer value representing the fitness of the type element*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
-	int m_iDistElementFitness;					/**< Integer value representing the fitness of the distance element*/
+	float m_iDistElementFitness;					/**< Integer value representing the fitness of the distance element*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
 	FString m_sQuestName;						/**< String value used to store the text of a quest name for diplay in the text box. */
@@ -194,6 +207,12 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
 	bool m_bChosen;								/**< integer value representing the fitness of the distance element*/
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
+	TEnumAsByte<QuestElements> m_eTypeElement;	/**< enum value representing the type element*/
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Quest")
+	TEnumAsByte<QuestElements> m_eDistElement;	/**< enum value representing the dist element*/
 
 	UQuestManager* m_pParent;					/**< Pointer to the quest manager*/
 };

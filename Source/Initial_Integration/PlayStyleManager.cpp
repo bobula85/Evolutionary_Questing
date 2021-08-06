@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayStyleManager.h"
+
+#include "QuestManager.h"
+
 #include "GenericPlatform/GenericPlatformMath.h"
 
 // Sets default values
@@ -53,14 +56,68 @@ void UPlayStyleManager::Init()
 	m_iFar_Rej = baseValue;
 
 
-	m_iKill_Fitness = 1;
-	m_iGather_Fitness = 1;
-	m_iFetch_Fitness = 1;
-	m_iExplore_Fitness = 1;
+	m_iKill_Fitness = 1.0;
+	m_iGather_Fitness = 1.0;
+	m_iFetch_Fitness = 1.0;
+	m_iExplore_Fitness = 1.0;
 	
-	m_iClose_Fitness = 1;
-	m_iMid_Fitness = 1;
-	m_iFar_Fitness = 1;
+	m_iClose_Fitness = 1.0;
+	m_iMid_Fitness = 1.0;
+	m_iFar_Fitness = 1.0;
+}
+
+bool UPlayStyleManager::IncrementStatValue(CompleteionStatElement element)
+{
+	auto temp = m_aStatPointers.FindByPredicate([element](CompletionStatPointerStruct& item) { return item.element == element; });
+
+	if (temp != nullptr)
+	{
+		*temp->completeionStat++;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool UPlayStyleManager::DecrementStatValue(CompleteionStatElement element)
+{
+	auto temp = m_aStatPointers.FindByPredicate([element](CompletionStatPointerStruct& item) { return item.element == element; });
+
+	if (temp != nullptr)
+	{
+		*temp->completeionStat--;
+		return true;
+	}
+	else
+		return false;
+}
+
+int UPlayStyleManager::GetStatValue(CompleteionStatElement element)
+{
+	auto temp = m_aStatPointers.FindByPredicate([element](CompletionStatPointerStruct& item) { return item.element == element; });
+
+	if (temp != nullptr)
+		return *temp->completeionStat;
+	else
+		return -1;
+}
+
+float UPlayStyleManager::GetFitnessValue(int element)
+{
+	auto temp = m_aFitnessPointers.FindByPredicate([element](FittnessPointerStruct& item) { return item.element == element; });
+
+	if (temp != nullptr)
+		return *temp->fitnessValue;
+	else
+		return -1;
+}
+
+void UPlayStyleManager::SetFitnessValue(int element, float val)
+{
+	auto temp = m_aFitnessPointers.FindByPredicate([element](FittnessPointerStruct& item) { return item.element == element; });
+
+	if (temp != nullptr)
+		*temp->fitnessValue = val;
 }
 
 void UPlayStyleManager::CalculateFitness()

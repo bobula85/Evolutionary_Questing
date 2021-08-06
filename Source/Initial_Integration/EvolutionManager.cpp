@@ -6,9 +6,15 @@
 
 #include "Engine.h"
 
+#include "Algo/Accumulate.h"
+#include "Algo/ForEach.h"
+
 #include "QuestManager.h"
 #include "Initial_IntegrationCharacter.h"
 #include "PlayStyleManager.h"
+
+
+
 
 
 
@@ -60,8 +66,8 @@ void UEvolutionManager::EvolveQuests()
 	m_pPlayer->style->CalculateFitness();
 
 	// Evaluate all current population solutions based on player statistics
-	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
-		Evaluate(m_pQuestMgr->vpPopulation[i]);
+	for (UQuest* q : m_pQuestMgr->vpPopulation)
+		Evaluate(q);
 
 	// Initiate the selection of the parent solutions
 	// using roulette wheel selection
@@ -99,159 +105,10 @@ void UEvolutionManager::EvolveQuests()
 
 void UEvolutionManager::Evaluate(UQuest* qst)
 {
-	// based on the qst type value set the fitness type element of the soultion
-	switch (qst->m_eType)
-	{
-		// Kill quest type
-	case TP_KILL:
-	{
-		// Set type fitness
-		qst->m_iTypeElementFitness = m_pPlayer->style->m_iKill_Fitness;
+	qst->m_iTypeElementFitness = m_pPlayer->style->GetFitnessValue(qst->m_eTypeElement);
+	qst->m_iDistElementFitness = m_pPlayer->style->GetFitnessValue(qst->m_eDistElement);
 
-		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->m_eDistBand)
-		{
-			// Close Quests
-		case DIST_CLOSE:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iKill_Fitness + m_pPlayer->style->m_iClose_Fitness);
-
-			break;
-		}
-		// Mid Quests
-		case DIST_MID:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iKill_Fitness + m_pPlayer->style->m_iMid_Fitness);
-			break;
-		}
-		// Far away quests
-		case DIST_FAR:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iKill_Fitness + m_pPlayer->style->m_iFar_Fitness);
-			break;
-		}
-		}
-
-		break;
-	}
-	// Gather quest type
-	case TP_GATHER:
-	{
-		// Set type fitness
-		qst->m_iTypeElementFitness = m_pPlayer->style->m_iGather_Fitness;
-
-		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->m_eDistBand)
-		{
-			// Close Quests
-		case DIST_CLOSE:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iGather_Fitness + m_pPlayer->style->m_iClose_Fitness);
-			break;
-		}
-		// Mid Quests
-		case DIST_MID:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iGather_Fitness + m_pPlayer->style->m_iMid_Fitness);
-			break;
-		}
-		// Far away quests
-		case DIST_FAR:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iGather_Fitness + m_pPlayer->style->m_iFar_Fitness);
-			break;
-		}
-		}
-
-		break;
-	}
-	// Protect quest type
-	case TP_EXPLORE:
-	{
-		// Set type fitness
-		qst->m_iTypeElementFitness = m_pPlayer->style->m_iExplore_Fitness;
-
-		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->m_eDistBand)
-		{
-			// Close Quests
-		case DIST_CLOSE:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iExplore_Fitness + m_pPlayer->style->m_iClose_Fitness);
-			break;
-		}
-		// Mid Quests
-		case DIST_MID:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iExplore_Fitness + m_pPlayer->style->m_iMid_Fitness);
-			break;
-		}
-		// Far away quests
-		case DIST_FAR:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iExplore_Fitness + m_pPlayer->style->m_iFar_Fitness);
-			break;
-		}
-		}
-
-		break;
-	}
-	// Defend quest type
-	case TP_FETCH:
-	{
-		// Set type fitness
-		qst->m_iTypeElementFitness = m_pPlayer->style->m_iFetch_Fitness;
-
-		// based on the qst distance banding value set the fitness of distance element and the total fitness of the soultion
-		switch (qst->m_eDistBand)
-		{
-			// Close Quests
-		case DIST_CLOSE:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iClose_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iFetch_Fitness + m_pPlayer->style->m_iClose_Fitness);
-			break;
-		}
-		// Mid Quests
-		case DIST_MID:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iMid_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iFetch_Fitness + m_pPlayer->style->m_iMid_Fitness);
-			break;
-		}
-		// Far away quests
-		case DIST_FAR:
-		{
-			qst->m_iDistElementFitness = m_pPlayer->style->m_iFar_Fitness;
-
-			qst->m_iTotalFitness = qst->m_iTotalFitness + (m_pPlayer->style->m_iFetch_Fitness + m_pPlayer->style->m_iFar_Fitness);
-			break;
-		}
-		}
-
-		break;
-	}
-	}
+	qst->m_iTotalFitness = qst->m_iTypeElementFitness + qst->m_iDistElementFitness;
 
 	if (qst->m_iTotalFitness <= 0)
 		qst->m_iTotalFitness = 1;
@@ -264,53 +121,24 @@ void UEvolutionManager::SelectRoulette()
 	m_aParents.Empty();
 
 	// Create a vecor to hold the sum of fitness values of selection
-	TArray<int> tempVec;
+	TArray<double> tempVec;
 
 	// Hold the sum of fitness total value
-	int sumOfFitness = 0;
-
-	// Loop through the population and increment the sum of fitness values accordingly
-	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
-	{
-		if (i == 0)
-			tempVec.Add(m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
-		else
-			tempVec.Add(tempVec[i - 1] + m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
-
-		sumOfFitness += (m_pQuestMgr->vpPopulation[i]->m_iTotalFitness);
-	}
+	double sumOfFitness = Algo::Accumulate(m_pQuestMgr->vpPopulation, 0, [&](double totalFitness, UQuest* q) { tempVec.Add(totalFitness + q->m_iTotalFitness); return totalFitness + q->m_iTotalFitness; });
 
 	// Loop through the population and select maxPairs of parent solutions 
 	for (int i = 0; i < m_iMaxPairs; i++)
 	{
-		// Generate random number between 1 and total fitness for both parents
-		int r1 = FMath::RandRange(1, sumOfFitness);
-		int r2 = FMath::RandRange(1, sumOfFitness);
-
 		// Create pair struct to hold both parents as one object
 		FPair parentPair;
 
-		// If the random number generated falls within the probaility value of
-		// a population solution then add it to the pair object as one of the parents.
-		for (int j = 0; j < tempVec.Num(); j++)
-		{
-			if (tempVec[j] >= r1)
-			{
-				parentPair.p1 = m_pQuestMgr->vpPopulation[j];
-				break;
-			}
-		}
+		int parent1Index = FindIndexOfPorbabiltyBoudry(FMath::RandRange(0.0f, sumOfFitness), tempVec);
+		int parent2Index = FindIndexOfPorbabiltyBoudry(FMath::RandRange(0.0f, sumOfFitness), tempVec);
 
-		for (int j = 0; j < tempVec.Num(); j++)
-		{
-			if (tempVec[j] >= r2)
-			{
-				parentPair.p2 = m_pQuestMgr->vpPopulation[j];
-				break;
-			}
-		}
+		parentPair.p1 =	(parent1Index != -1) ? m_pQuestMgr->vpPopulation[parent1Index] : nullptr;
+		parentPair.p2 = (parent2Index != -1) ? m_pQuestMgr->vpPopulation[parent2Index] : nullptr;
 
-		if (parentPair.p1 == parentPair.p2)
+		if ((parentPair.p1 == parentPair.p2) || (parentPair.p1 == nullptr) || (parentPair.p2 == nullptr))
 			i--;
 		else
 			// add the parent pair to the parent vector
@@ -324,87 +152,51 @@ void UEvolutionManager::SelectRanked()
 	// Empty the parents vector
 	m_aParents.Empty();
 
-	// Array to hold the population sorted by fitness
-	TArray<UQuest*> tempVecSortedPop;
-
-	// Add all quests to the sort array
-	for (int i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
-		tempVecSortedPop.Add(m_pQuestMgr->vpPopulation[i]);
-
-	// Sort the array using a basic lambda function
-	tempVecSortedPop.Sort([](const UQuest& a, const UQuest& b) { return a.m_iTotalFitness < b.m_iTotalFitness; });
+	// Sort the population array based on quest total fitness
+	m_pQuestMgr->vpPopulation.Sort([](const UQuest& a, const UQuest& b) { return a.m_iTotalFitness < b.m_iTotalFitness; });
 
 	// calculates the total sum of all the ranked positions in the array (eg an array of 4 is 10 as 1+2+3+4 = 10)
-	double sumOfRanks = ((double)tempVecSortedPop.Num() + 1) * ((double)tempVecSortedPop.Num() / 2);
+	double sumOfRanks = ((double)m_pQuestMgr->vpPopulation.Num() + 1) * ((double)m_pQuestMgr->vpPopulation.Num() / 2);
 
-	TArray<double> probs;
+	TArray<double> probs;		
 
-	for (int i = 0; i < tempVecSortedPop.Num(); i++)
-	{
-		//calculates raks probablility i = rank
-		double prob = ((i+1) / sumOfRanks) * 100;
-		probs.Add(prob);
-	}
+	for (auto i = 0; i < m_pQuestMgr->vpPopulation.Num(); i++)
+		probs.Add(((i + 1) / sumOfRanks) * 100);
 
 	// Array to hold the stacked probaility of selection values
 	TArray<double> stackedProbabilities;
 
-	// variable to hold the sum of all of the probabilities (should be 100%)
-	double sumOfRankedFitness = 0;
+	// Hold the sum of fitness total value
+	double sumOfRankedFitness = Algo::Accumulate(probs, 0.0, [&](double totalFitness, double prob) { stackedProbabilities.Add(totalFitness + prob); return totalFitness + prob; });
 
-	// Loop through the population and increment the sum of fitness values accordingly
-	// so that the probabilities stack ready to be selected from eq |  prob1 |   prob2 = prob1 +prob2     |		prob3 = prob2 + prob3			| etc
-	for (int i = 0; i < probs.Num(); i++)
-	{
-		if (i == 0)
-			stackedProbabilities.Add(probs[i]);
-		else
-			// |  prob1 |   prob2 = prob1 +prob2     |		prob3 = prob2 + prob3			| etc
-			stackedProbabilities.Add(stackedProbabilities[i - 1] + probs[i]);
-
-		// should be 100%
-		sumOfRankedFitness += probs[i];
-	}
-
-	// Loop though maxPairs to select all parent pairs
+	// Loop through the population and select maxPairs of parent solutions 
 	for (int i = 0; i < m_iMaxPairs; i++)
 	{
-		// Generate a random number for each parent selection between 1 and sum of fitness (should be 100)
-		int r1 = FMath::RandRange(1, sumOfRankedFitness);
-		int r2 = FMath::RandRange(1, sumOfRankedFitness);
-
+		// Create pair struct to hold both parents as one object
 		FPair parentPair;
 
-		for (int j = 0; j < stackedProbabilities.Num(); j++)
-		{	
-			// If the random number generated falls within the probaility value of
-			// a population solution then add it to the pair object as one of the parents.
-			if (stackedProbabilities[j] >= (double)r1)
-			{
-				parentPair.p1 = m_pQuestMgr->vpPopulation[j];
-				break;
-			}
-		}
+		int parent1Index = FindIndexOfPorbabiltyBoudry(FMath::RandRange(0.0f, sumOfRankedFitness), stackedProbabilities);
+		int parent2Index = FindIndexOfPorbabiltyBoudry(FMath::RandRange(0.0f, sumOfRankedFitness), stackedProbabilities);
 
-		// If the random number generated falls within the probaility value of
-		// a population solution then add it to the pair object as one of the parents.
-		for (int j = 0; j < stackedProbabilities.Num(); j++)
-		{
-			if (stackedProbabilities[j] >= (double)r2)
-			{
-				parentPair.p2 = m_pQuestMgr->vpPopulation[j];
-				break;
-			}
-		}
+		parentPair.p1 = (parent1Index != -1) ? m_pQuestMgr->vpPopulation[parent1Index] : nullptr;
+		parentPair.p2 = (parent2Index != -1) ? m_pQuestMgr->vpPopulation[parent2Index] : nullptr;
 
-		// if parents are the same solution then repeat the selection process
-		if (parentPair.p1 == parentPair.p2)
+		if ((parentPair.p1 == parentPair.p2) || (parentPair.p1 == nullptr) || (parentPair.p2 == nullptr))
 			i--;
 		else
 			// add the parent pair to the parent vector
 			m_aParents.Add(parentPair);
 	}
+}
 
+int UEvolutionManager::FindIndexOfPorbabiltyBoudry(double randonNumer, TArray<double>& statckedProbailities)
+{
+	auto index = statckedProbailities.IndexOfByPredicate([randonNumer](double fitnessValue) { return fitnessValue >= randonNumer; });
+
+	if (index)
+		return index;
+	else
+		return -1; 
 }
 
 void UEvolutionManager::Combine()
@@ -428,6 +220,7 @@ void UEvolutionManager::Combine()
 		// Update child solutions distance, name and description information
 		child1->SetDistanceFromPlayer(m_pPlayer->GetActorLocation());
 		child2->SetDistanceFromPlayer(m_pPlayer->GetActorLocation());
+
 		child1->setDistName();
 		child2->setDistName();
 
@@ -640,8 +433,8 @@ void UEvolutionManager::Survive()
 	TArray<UQuest*> tempNewPop;
 
 	// Evaluate the child solution so that all fittnesses are updated
-	for (int i = 0; i < m_aChildren.Num(); i++)
-		Evaluate(m_aChildren[i]);
+	for (UQuest* quest : m_aChildren)
+		Evaluate(quest);
 
 	// Loop through the current population and include quests accepted but 
 	// not completed in the next generation by default
@@ -708,6 +501,8 @@ void UEvolutionManager::Survive()
 			}
 		}
 	}
+
+	m_pQuestMgr->vpPopulation = tempNewPop;
 
 	// Empty the quest managers population list
 	m_pQuestMgr->vpPopulation.Empty();

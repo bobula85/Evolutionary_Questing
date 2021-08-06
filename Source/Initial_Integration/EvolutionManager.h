@@ -202,6 +202,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EvoManagment")
 	void SelectRanked();
 
+	//! A function which returns the indes of a probability element whos boundry fals withing a randomly generated number
+	/*!
+	* 	\param randonNumer - a randomly generated number between zero and the total sum of the elements fitness values.
+		\param statckedProbailities - refernece to an array of stacked fittness values.
+	*/
+	int FindIndexOfPorbabiltyBoudry(double randonNumer, TArray<double>& statckedProbailities);
+
 	//! A function which creates new solutions from the parents selected in SelectionRoulette() and SelectRanked().
 	/*!
 	*/
@@ -294,4 +301,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EvoManagment")
 	Ffrequency_Count m_PreviousFreqInfoFin;				/*!< A structure that holds the previous populations frequency information at the end of an evolution. */
+
+	//TStaticArray<
 };
